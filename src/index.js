@@ -18,6 +18,7 @@ const _ = require("lodash")
 		"codepipeline",
 		"codepipeline-approval",
 		"guardduty",
+		"securityhub",
 		"inspector",
 		"rds",
 		"ecs-event",
