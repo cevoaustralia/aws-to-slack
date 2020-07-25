@@ -135,18 +135,19 @@ exports.parse = event => {
 		const country = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.country.countryName");
 		const city = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.city.cityName");
 
-		const remotePort = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.remotePortDetails.port");
-		const remotePortName = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.remotePortDetails.portName");
+		const remotePort = _.get(detail, "service.action.networkConnectionAction.remotePortDetails.port");
+		const remotePortName = _.get(detail, "service.action.networkConnectionAction.remotePortDetails.portName");
 
-		const localPort = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.localPortDetails.port");
-		const localPortName = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.localPortDetails.portName");
+		const localIpAddress = _.get(detail, "service.action.networkConnectionAction.localIpDetails.ipAddressV4");
+		const localPort = _.get(detail, "service.action.networkConnectionAction.localPortDetails.port");
+		const localPortName = _.get(detail, "service.action.networkConnectionAction.localPortDetails.portName");
 
-		const localPortBlocked = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.protocol.blocked");
-		const localIpAddress = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.protocol.localIpDetails.ipAddressV4");
+		const protocol = _.get(detail, "service.action.networkConnectionAction.protocol");
+		const blocked = _.get(detail, "service.action.networkConnectionAction.blocked");
 
 		fields.push({
 			title: "Connection",
-			value: `${connectionDirection}`,
+			value: `${connectionDirection} on ${localIpAddress} (${protocol}:${localPort})`,
 			short: false
 		});
 
@@ -161,16 +162,12 @@ exports.parse = event => {
 			value: `${country} - ${city}`,
 			short: true
 		});
-		fields.push({
-			title: "Remote Details",
-			value: `${remotePort} (${remotePortName})`,
-			short: true
-		});
-		fields.push({
-			title: "Local Details",
-			value: `${localPort} (${localPortName})`,
-			short: true
-		});
+		//
+		// fields.push({
+		// 	title: "Remote Details",
+		// 	value: `${remotePort} (${remotePortName})`,
+		// 	short: true
+		// });
 	}
 	else {
 		console.log(`Unknown GuardDuty actionType '${actionType}'`);
