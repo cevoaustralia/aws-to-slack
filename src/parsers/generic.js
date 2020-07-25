@@ -1,41 +1,93 @@
-"use strict";
+//
+// Generic event parser
+// Should safely be able to parse ANY kind of message and generate a Slack Message containing
+// the contents of that structure.
+//
+exports.matches = () => true; // Match every event
 
-const BbPromise = require("bluebird"),
-	_ = require("lodash"),
-	Slack = require("../slack");
+exports.parse = event => {
+	// Clone object so we can delete known keys
+	const msg = _.clone(event.message);
+	const fallback = JSON.stringify(event.record, null, 2);
 
-class GenericParser {
+	let title = event.getSubject() || "Raw Event",
+		author_name = event.getSource() || "<unknown>",
+		fields, text;
 
-	parse(event) {
-		return BbPromise.try(() => {
-			let text, time, title;
-			if (_.has(event, "Records[0].Sns.Message")) {
-				// Output the SNS message body
-				title = _.get(event, "Records[0].Sns.Subject");
-				text = _.get(event, "Records[0].Sns.Message");
-				time = new Date(_.get(event, "Records[0].Sns.Timestamp"));
+	if (_.isObject(msg)) {
+		if (msg.source) {
+			let t = [];
+			if (msg.region) {
+				t.push(msg.region);
+				delete msg.region;
 			}
-			else {
-				// Serialize the whole event data
-				text = event;
+			if (msg.account) {
+				t.push(msg.account);
+				delete msg.account;
 			}
+			t = t.length ? ` (${t.join(" - ")})` : "";
+			author_name = `${msg.source}${t}`;
+			delete msg.source;
+		}
 
-			if (!_.isString(text)) {
-				text = JSON.stringify(text, null, 2);
-			}
+		if (msg["detail-type"]) {
+			title = msg["detail-type"];
+			delete msg["detail-type"];
+		}
 
-			const slackMessage = {
-				attachments: [{
-					fallback: text,
-					color: Slack.COLORS.neutral,
-					ts: Slack.toEpochTime(time ? time : new Date()),
-					title,
-					text
-				}]
-			};
-			return BbPromise.resolve(slackMessage);
-		});
+		if (msg.time) {
+			// automatically picked up by default handler
+			delete msg.time;
+		}
+
+		// Serialize the whole event data
+		fields = objectToFields(msg);
+		text = fields ? ""
+		// eslint-disable-next-line lodash/prefer-lodash-method
+			: JSON.stringify(msg, null, 2)
+				.replace(/^{\n/, "")
+				.replace(/\n}\n?$/, "");
 	}
-}
+	else if (_.isString(msg)) {
+		text = msg;
+	}
 
-module.exports = GenericParser;
+	return event.attachmentWithDefaults({
+		color: event.COLORS.neutral,
+		fallback,
+		author_name,
+		title,
+		text,
+		fields,
+	});
+};
+
+function objectToFields(obj) {
+	let fields;
+	const keys = _.keys(obj);
+	if (0 < keys.length && keys.length <= 8) {
+		fields = [];
+		for (const key of keys) {
+			let val = obj[key];
+			if (key === "version" && !val) {
+				// the "version" key is included in a lot of events and it's not super helpful
+				continue;
+			}
+			if (!_.isString(val)) {
+				// pull first string from array
+				if (_.isArray(val) && val.length === 1 && _.isString(val[0])) {
+					val = val[0];
+				}
+				else {
+					val = JSON.stringify(val);
+				}
+			}
+			fields.push({
+				title: key,
+				value: val,
+				short: val.length < 40,
+			});
+		}
+	}
+	return fields;
+}

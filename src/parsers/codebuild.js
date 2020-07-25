@@ -1,72 +1,57 @@
-"use strict";
+//
+// AWS CodeBuild events
+//
+exports.matches = event =>
+	event.getSource() === "codebuild";
 
-const BbPromise = require("bluebird"),
-	_ = require("lodash"),
-	Slack = require("../slack");
+exports.parse = event => {
+	const buildStatus = event.get("detail.build-status");
+	const project = event.get("detail.project-name");
+	const buildId = _.split(event.get("detail.build-id"), ":").pop();
+	const buildUrl = event.consoleUrl(`/codesuite/codebuild/projects/${project}/build/${encodeURIComponent(project + ":" + buildId)}/`);
 
-class CodeBuildParser {
+	const author_name = "AWS CodeBuild"
+		+ (event.getAccountId() ? ` (${event.getAccountId()})` : "");
+	const title = project;
+	const title_link = buildUrl;
+	const fields = [];
 
-	parse(event) {
-		return BbPromise.try(() => _.isObject(event) ? event : JSON.parse(event))
-		.catch(_.noop) // ignore JSON errors
-		.then(event => {
-			if (_.get(event, "source") !== "aws.codebuild") {
-				return BbPromise.resolve(false);
-			}
+	const color = (COLORS => {
+		switch (buildStatus) {
+		case "SUCCEEDED":
+			return COLORS.ok;
+		case "STOPPED":
+			return COLORS.warning;
+		case "FAILED":
+			return COLORS.critical;
+		case "IN_PROGRESS":
+		default:
+			return event.COLORS.neutral;
+		}
+	})(event.COLORS);
 
-			const time = new Date(_.get(event, "time"));
-			const buildStatus = _.get(event, "detail.build-status");
-			const project = _.get(event, "detail.project-name");
-			const logsUrl = `https://console.aws.amazon.com/cloudwatch/home?region=${event.region}#logEventViewer:group=/aws/codebuild/${project};start=PT5M`;
-			const projectUrl = `https://console.aws.amazon.com/codebuild/home?region=${event.region}#/projects/${project}/view`;
-			const fields = [];
-
-			let color = Slack.COLORS.neutral;
-			let title = project;
-			if (buildStatus === "SUCCEEDED") {
-				title = `<${projectUrl}|${project}> has finished building`;
-				color = Slack.COLORS.ok;
-			}
-			else if (buildStatus === "STOPPED") {
-				title = `<${projectUrl}|${project}> was stopped`;
-				color = Slack.COLORS.warning;
-			}
-			else if (buildStatus === "FAILED") {
-				title = `<${projectUrl}|${project}> has failed to build`;
-				color = Slack.COLORS.critical;
-			}
-			else if (buildStatus === "IN_PROGRESS") {
-				title = `<${projectUrl}|${project}> has started building`;
-			}
-
-			if (buildStatus) {
-				fields.push({
-					title: "Status",
-					value: buildStatus,
-					short: true
-				});
-			}
-
-			fields.push({
-				title: "Logs",
-				value: `<${logsUrl}|View Logs>`,
-				short: true
-			});
-
-			const slackMessage = {
-				attachments: [{
-					author_name: "Amazon CodeBuild",
-					fallback: `${project} ${buildStatus}`,
-					color: color,
-					title: title,
-					fields: fields,
-					mrkdwn_in: [ "title", "text" ],
-					ts: Slack.toEpochTime(time)
-				}]
-			};
-			return BbPromise.resolve(slackMessage);
+	if (buildStatus) {
+		fields.push({
+			title: "Status",
+			value: buildStatus,
+			short: true
 		});
 	}
-}
 
-module.exports = CodeBuildParser;
+	const logLink = event.getLink(
+		"View Logs",
+		event.consoleUrl(`/cloudwatch/home#logEventViewer:group=/aws/codebuild/${project};start=PT5M`)
+	);
+	if (logLink.willPrintLink) {
+		fields.push({
+			title: "Logs",
+			value: logLink.toString(),
+			short: true
+		});
+	}
+
+	return event.attachmentWithDefaults({
+		color, author_name, title, title_link, fields,
+		fallback: `${project} ${buildStatus}`,
+	});
+};

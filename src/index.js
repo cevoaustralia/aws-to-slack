@@ -1,64 +1,182 @@
-"use strict";
-
-const BbPromise = require("bluebird"),
-	_ = require("lodash"),
-	Slack = require("./slack");
-
-function processIncoming(event) {
-	const GenericParser = require("./parsers/generic");
-	const parsers = [
-		require("./parsers/cloudwatch"),
-		require("./parsers/rds"),
-		require("./parsers/beanstalk"),
-		require("./parsers/aws-health"),
-		require("./parsers/inspector"),
-		require("./parsers/codebuild"),
-		require("./parsers/codedeploy"),
-		require("./parsers/ses-received"),
-		require("./parsers/codecommit/pullrequest"),
-		require("./parsers/codecommit/repository"),
+const _ = require("lodash")
+	, EventDef = require("./eventdef")
+	, Slack = require("./slack")
+	, Emailer = require("./ses")
+	, defaultParserWaterfall = [
+		// Ordered list of parsers:
+		"cloudwatch",
+		"codecommit/pullrequest",
+		"codecommit/repository",
+		"autoscaling",
+		"aws-health",
+		"batch-events",
+		"beanstalk",
+		"cloudformation",
+		"codebuild",
+		"codedeployCloudWatch",
+		"codedeploySns",
+		"codepipeline",
+		"codepipeline-approval",
+		"guardduty",
+		"inspector",
+		"rds",
+		"ecs-event",
+		"ses-bounce",
+		"ses-complaint",
+		"ses-received",
+		// Last attempt to parse, will match any message:
+		"generic",
 	];
 
-	// Execute all parsers and use the first successful result
-	return BbPromise.any(_.map(parsers, Parser => {
-		if (_.isEmpty(event)) {
-			return BbPromise.resolve();
-		}
+class LambdaHandler {
 
-		const parser = new Parser();
-		return parser.parse(event)
-		.then(result => result ? result : BbPromise.reject()); // reject on empty result
-	}))
-	.catch(BbPromise.AggregateError, err => {
-		_.forEach(_.compact(err), err => {
-			// Rethrow on internal errors
-			return BbPromise.reject(err);
+	constructor(waterfall = defaultParserWaterfall) {
+		this.lastParser = null;
+		this.parsers = _.map(waterfall, name => {
+			const parser = require(`./parsers/${name}`);
+			if (!parser.name) {
+				// modify package in-memory
+				parser.name = name;
+			}
+			return parser;
 		});
-		console.log("No parser was able to parse the message.");
+	}
 
-		// Fallback to the generic parser if none other succeeded
-		const parser = new GenericParser();
-		return parser.parse(event);
-	})
-	.then(message => {
-		// Finally forward the message to Slack
-		if (_.isEmpty(message)) {
-			console.log("Skipping empty message.");
-			return BbPromise.resolve();
+	/**
+	 * Run .parse() on each handler in-sequence.
+	 *
+	 * @param {EventDef} eventDef Single-event object
+	 * @returns {Promise<?{}>} Resulting message or null if no match found
+	 */
+	async processEvent(eventDef) {
+		const matchingParsers = this.matchToParser(eventDef);
+		if (!matchingParsers.length) {
+			console.error("No parsers matched!");
+		}
+		if (matchingParsers.length > 2) {
+			// [0] => custom parser
+			// [1] => custom parser <<< this is the problem!
+			// [2] => generic parser
+			console.log("Multiple Parsers matched (using first):", _.map(matchingParsers, p => p.name));
 		}
 
-		console.log("Sending Message to Slack:", JSON.stringify(message, null, 2));
-		return Slack.postMessage(message);
-	})
-	.catch(err => {
-		console.log("ERROR:", err);
-	});
+		// Execute all parsers and use the first successful result
+		for (const parser of matchingParsers) {
+			const parserName = parser.name;
+			this.lastParser = parserName;
+			try {
+				const message = await parser.parse(eventDef);
+				if (message) {
+					// Truthy but empty message will stop execution
+					if (message === true || _.isEmpty(message)) {
+						// leave value in this.lastParser
+						return null;// never send empty message
+					}
+
+					return { parser, parserName, slackMessage: message };
+				}
+			}
+			catch (e) {
+				console.error(`Error parsing event [parser:${parserName}]:`, e);
+			}
+			// clear state
+			this.lastParser = null;
+		}
+	}
+
+	/**
+	 * Return all matched parsers for event.
+	 *
+	 * @param {EventDef} eventDef Event abstraction instance
+	 * @returns {Array} List of parsers that claim to match event
+	 */
+	matchToParser(eventDef) {
+		return _.filter(this.parsers, parser => {
+			try {
+				return parser.matches(eventDef);
+			}
+			catch (err) {
+				console.error(`matchToParser[${parser.name}]`, err);
+				return false;
+			}
+		});
+	}
+
+	/**
+	 * Lambda event handler.
+	 *
+	 * @param {{}} event Event object received via Lambda payload
+	 * @param {{}} context Lambda execution context
+	 * @param {Function} callback Lambda completion callback
+	 * @returns {Promise<void>} No return value
+	 */
+	static async handler(event, context, callback) {
+		context.callbackWaitsForEmptyEventLoop = false;
+		console.log("Incoming Message:", JSON.stringify(event, null, 2));
+
+		if (_.isString(event)) {
+			try {
+				event = JSON.parse(event);
+			}
+			catch (err) {
+				console.error(`Error parsing event JSON (continuing...): ${event}`);
+			}
+		}
+
+		try {
+			const handler = new LambdaHandler();
+			const waitingTasks = [];
+
+			// Handle SNS payloads with >1 messages differently!
+			// To keep parsers as simple as possible, merge event into single-Record messages.
+			const Records = _.get(event, "Records");
+			if (_.isArray(Records) && Records.length > 1) {
+				for (const i in Records) {
+					// Copy single record into event
+					const singleRecordEvent = _.assign({}, event, {
+						Records: [ Records[i] ],
+					});
+
+					const res = await handler.processEvent(new EventDef(singleRecordEvent));
+					if (res) {
+						const message = res.slackMessage;
+						console.log(`SNS-Record[${i}]: Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+						waitingTasks.push(Slack.postMessage(message));
+						waitingTasks.push(Emailer.checkAndSend(message, event));
+					}
+					else if (handler.lastParser) {
+						console.error(`SNS-Record[${i}]: Parser[${handler.lastParser}] is force-ignoring record`);
+					}
+					else {
+						console.log(`SNS-Record[${i}]: No parser matched record`);
+					}
+				}
+			}
+			else {
+				const res = await handler.processEvent(new EventDef(event));
+				if (res) {
+					const message = res.slackMessage;
+					console.log(`Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+					waitingTasks.push(Slack.postMessage(message));
+					waitingTasks.push(Emailer.checkAndSend(message, event));
+				}
+				else if (handler.lastParser) {
+					console.error(`Parser[${handler.lastParser}] is force-ignoring event`);
+				}
+				else {
+					console.log("No parser matched event");
+				}
+			}
+
+			await Promise.all(waitingTasks);
+
+			callback();
+		}
+		catch (e) {
+			console.log("ERROR:", e);
+			callback(e);
+		}
+	}
 }
 
-module.exports.handler = (event, context, callback) => {
-	context.callbackWaitsForEmptyEventLoop = false;
-
-	// no return here as we're invoking the callback directly
-	console.log("Incoming Message:", JSON.stringify(event, null, 2));
-	BbPromise.resolve(processIncoming(event)).asCallback(callback);
-};
+module.exports = LambdaHandler;
