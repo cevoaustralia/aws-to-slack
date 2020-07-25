@@ -1,12 +1,12 @@
 //
-// AWS GuardDuty event parser
+// AWS SecurityHub event parser
 //
 exports.matches = event =>
 	event.getSource() === "securityhub"
 	|| _.get(event.message, "detail.service.serviceName") === "securityhub";
 
 
-P// account
+// account
 // detail-type
 // detail.findings.0.AwsAccountId
 // detail.findings.0.Compliance.Status
