@@ -54,7 +54,10 @@ exports.matches = event =>
 
 
 exports.parse = event => {
+	console.log(`Event ${JSON.stringify(event, null, 2)}`);
+
 	const detail = event.get("detail");
+	console.log(`Detail ${JSON.stringify(detail, null, 2)}`);
 
 	const id = _.get(detail, "id");
 	const generatorId = _.get(detail, "GeneratorId");
@@ -68,7 +71,7 @@ exports.parse = event => {
 	const criticality = _.get(detail, "Criticality");
 
 	const accountId = _.get(detail, "AwsAccountId");
-	const resources = _.get(detail, "Resources");
+	const resources = _.get(detail, "resources");
 	const recomendationText = _.get(detail, "Remediation.Recommendation.Text");
 	const recomendationLink = _.get(detail, "Remediation.Recommendation.Url");
 
@@ -116,11 +119,11 @@ exports.parse = event => {
 		short: true
 	});
 
-	fields.push({
-		title: "Affected Resource",
-		value: `${resources[0].Type} - ${resources[0].Id}`,
-		short: false
-	});
+	// fields.push({
+	// 	title: "Affected Resource",
+	// 	value: `${resources[0].Type} - ${resources[0].Id}`,
+	// 	short: false
+	// });
 
 	fields.push({
 		title: "Recommendation",
