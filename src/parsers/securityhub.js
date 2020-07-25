@@ -63,10 +63,14 @@ exports.parse = event => {
 	const createdAt = new Date(_.get(detail, "UpdatedAt"));
 	const firstSeen = new Date(_.get(detail, "FirstObservedAt"));
 	const lastSeen = new Date(_.get(detail, "LastObservedAt"));
-	const severity = _.get(detail, "Severity");
+	// const severity = _.get(detail, "Severity");
+	const severity = _.get(detail, "severity.normalized");
 	const criticality = _.get(detail, "Criticality");
 
 	const accountId = _.get(detail, "AwsAccountId");
+	const resources = _.get(detail, "Resources");
+	const recomendationText = _.get(detail, "Remediation.Recommendation.Text");
+	const recomendationLink = _.get(detail, "Remediation.Recommendation.Url");
 
 	const fields = [];
 
@@ -82,15 +86,21 @@ exports.parse = event => {
 		short: true
 	});
 
-	fields.push({
-		title: "Region",
-		value: region,
-		short: true
-	});
+	// fields.push({
+	// 	title: "Region",
+	// 	value: region,
+	// 	short: true
+	// });
+	//
+	// fields.push({
+	// 	title: "Type",
+	// 	value: type,
+	// 	short: true
+	// });
 
 	fields.push({
-		title: "Type",
-		value: type,
+		title: "Severity",
+		value: severity,
 		short: true
 	});
 
@@ -108,35 +118,29 @@ exports.parse = event => {
 
 	fields.push({
 		title: "Affected Resource",
-		value: affectedResources,
+		value: `${resources[0].Type} - ${resources[0].Id}`,
 		short: false
 	});
 
 	fields.push({
-		title: "Severity",
-		value: severity,
-		short: false
+		title: "Recommendation",
+		value: `${recomendationLink} - ${recomendationText}`
 	});
 
-	// if (resourceType === "Instance") {
-	//
-	//
-	// }
-	// else {
-	console.log(`Unknown GuardDuty resourceType '${resourceType}'`);
 
-	fields.push({
-		title: "Unknown Resource Type (" + resourceType + ")",
-		value: JSON.stringify(_.get(event, "resource"), null, 2),
-		short: false
-	});
-	// }
+	// console.log(`Unknown GuardDuty resourceType '${resourceType}'`);
+	//
+	// fields.push({
+	// 	title: "Unknown Resource Type (" + resourceType + ")",
+	// 	value: JSON.stringify(_.get(event, "resource"), null, 2),
+	// 	short: false
+	// });
 
 	let color = event.COLORS.neutral; //low severity below 50
-	if (criticality > 50) { //medium seveirty between 50 and 80
+	if (criticality > 39) { //medium severity between 50 and 80
 		color = event.COLORS.warning;
 	}
-	if (criticality > 80) { //high sevirity above 80
+	if (criticality > 80) { //high severity above 80
 		color = event.COLORS.critical;
 	}
 
