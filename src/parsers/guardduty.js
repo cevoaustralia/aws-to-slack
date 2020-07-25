@@ -124,11 +124,59 @@ exports.parse = event => {
 			short: true
 		});
 	}
+	else if (actionType === "NETWORK_CONNECTION") {
+
+		const connectionDirection = _.get(detail, "service.action.networkConnectionAction.connectionDirection");
+
+		const ipAddressV4 = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.ipAddressV4");
+		const isp = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.organization.isp");
+		const org = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.organization.org");
+
+		const country = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.country.countryName");
+		const city = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.city.cityName");
+
+		const remotePort = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.remotePortDetails.port");
+		const remotePortName = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.remotePortDetails.portName");
+
+		const localPort = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.localPortDetails.port");
+		const localPortName = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.localPortDetails.portName");
+
+		const localPortBlocked = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.protocol.blocked");
+		const localIpAddress = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.protocol.localIpDetails.ipAddressV4");
+
+		fields.push({
+			title: "Connection",
+			value: `${connectionDirection}`,
+			short: false
+		});
+
+		fields.push({
+			title: "API origin",
+			value: `${ipAddressV4}\n${isp} - ${org}`,
+			short: true
+		});
+
+		fields.push({
+			title: "Location",
+			value: `${country} - ${city}`,
+			short: true
+		});
+		fields.push({
+			title: "Remote Details",
+			value: `${remotePort} (${remotePortName})`,
+			short: true
+		});
+		fields.push({
+			title: "Local Details",
+			value: `${localPort} (${localPortName})`,
+			short: true
+		});
+	}
 	else {
 		console.log(`Unknown GuardDuty actionType '${actionType}'`);
 
 		fields.push({
-			title: "Unknown Action Type (${actionType})",
+			title: `Unknown Action Type (${actionType})`,
 			value: JSON.stringify(_.get(detail, "service.action"), null, 2),
 			short: false
 		});
