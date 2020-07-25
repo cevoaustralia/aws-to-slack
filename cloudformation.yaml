@@ -19,10 +19,15 @@ Parameters:
   ParentAlertStack:
     Type: String
     Description: 'Optional: Stack name containing SNS topic from https://github.com/widdix/aws-cf-templates/blob/master/operations/alert.yaml'
+    Default: ''
   ErrorAlertEmail:
     Description: 'Optional: email address to receive alert that function is failing. The email will only contain a count of failures -- you will need to then review CloudWatch logs to determine cause of the issue. HIGHLY RECOMMEND handling failures like this within a DeadLetterQueue via ParentAlertStack instead.'
     Type: String
     Default: ''
+  BucketPrefix:
+    Description: 'S3 bucket prefix to deploy the lambda function from'
+    Type: String
+    Default: 'aws-to-slack'
   HookUrl:
     Type: String
     Description: 'Slack webhook URL; see https://example.slack.com/apps/'
@@ -52,7 +57,7 @@ Resources:
       MemorySize: 256
       Timeout: 15 # Cross-region metrics lookup requires at least 10s
       Code:
-        S3Bucket: !Sub 'aws-to-slack-${AWS::Region}'
+        S3Bucket: !Sub '${BucketPrefix}-${AWS::Region}'
         S3Key: release.zip
       Environment:
         Variables:

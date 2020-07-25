@@ -1,6 +1,7 @@
 AWS_CLI	   ?= /usr/local/bin/aws
 TEMP_PATH   = .temp
 RELEASE_ZIP = release.zip
+BUCKET_PREFIX ?= aws-to-slack
 
 # Load from .env file
 ifdef TARGET
@@ -26,6 +27,8 @@ ifeq (,$(wildcard $(RELEASE_ZIP)))
   usesReleaseZip := package
 endif
 
+info:
+	@echo "Deploying to $(BUCKET_PREFIX)"
 
 # Create release.zip file
 .PHONY: package
@@ -103,5 +106,5 @@ REGIONS ?= \
 .PHONY: publish
 publish: $(usesReleaseZip) $(REGIONS)
 $(REGIONS):
-	aws $(awsProfile) s3 cp "./cloudformation.yaml" "s3://aws-to-slack-$@" --acl public-read
-	aws $(awsProfile) s3 cp "$(RELEASE_ZIP)" "s3://aws-to-slack-$@" --acl public-read
+	aws $(awsProfile) s3 cp "./cloudformation.yaml" "s3://$(BUCKET_PREFIX)-$@" --acl public-read
+	aws $(awsProfile) s3 cp "$(RELEASE_ZIP)" "s3://$(BUCKET_PREFIX)-$@" --acl public-read
