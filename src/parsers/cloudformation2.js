@@ -7,12 +7,14 @@ exports.matches = event =>
 exports.parse = event => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
-	const version = event.get("version");
-	const id = event.get("id");
-	const source = event.get("source");
-	const account = event.get("account");
-	const time = event.get("time");
-	const region = event.get("region");
+	const message = event.message;
+
+	const version = message.get("version");
+	const id = message.get("id");
+	const source = message.get("source");
+	const account = message.get("account");
+	const time = message.get("time");
+	const region = message.get("region");
 
 	const detail = event.get("detail");
 
@@ -32,9 +34,15 @@ exports.parse = event => {
 	const fields = [];
 
 	fields.push({
+		title: "Id",
+		value: `${id}`,
+		short: false
+	});
+
+	fields.push({
 		title: "Event Name",
 		value: `${eventName} (${awsRegion})`,
-		short: false
+		short: true
 	});
 
 	fields.push({
