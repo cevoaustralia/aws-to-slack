@@ -7,22 +7,22 @@ exports.matches = event =>
 exports.parse = event => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
-	const message = event.get("message");
+	const version = _.get(event, "version");
+	const id = _.get(event, "id");
+	const source = _.get(event, "source");
+	const account = _.get(event, "account");
+	const time = _.get(event, "time");
+	const region = _.get(event, "region");
 
-	const version = _.get(message, "version");
-	const id = _.get(message, "id");
-	const source = _.get(message, "source");
-	const account = _.get(message, "account");
-	const time = _.get(message, "time");
-	const region = _.get(message, "region");
-
-	const detail = _.get(message, "detail");
+	const detail = _.get(event, "detail");
 
 	const userIdentity = _.get(detail, "userIdentity");
 	const userPrincipal = _.get(userIdentity, "principalId");
+	const userName = _.get(userIdentity, "userName");
 
 	const eventTime = _.get(detail, "eventTime");
 	const eventName = _.get(detail, "eventName");
+	const awsRegion = _.get(detail, "awsRegion");
 	const userAgent = _.get(detail, "userAgent");
 	const errorCode = _.get(detail, "errorCode");
 	const errorMessage = _.get(detail, "errorMessage");
@@ -33,7 +33,7 @@ exports.parse = event => {
 
 	fields.push({
 		title: "Event Name",
-		value: eventName,
+		value: `${eventName} (${awsRegion})`,
 		short: false
 	});
 
@@ -42,6 +42,24 @@ exports.parse = event => {
 		value: userAgent,
 		short: true
 	});
+
+	fields.push({
+		title: "Invoked by",
+		value: userName || userPrincipal,
+		short: true
+	});
+
+	if (requestParameters) {
+		for (var name in requestParameters) {
+			const value = requestParameters[name];
+
+			fields.push({
+				title: name,
+				value: value,
+				short: true
+			});
+		}
+	}
 
 	if (errorMessage) {
 		fields.push({
