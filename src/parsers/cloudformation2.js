@@ -20,7 +20,7 @@ exports.parse = event => {
 
 	const userIdentity = _.get(detail, "userIdentity");
 	const userPrincipal = _.get(userIdentity, "principalId");
-	const userName = _.get(userIdentity, "userName");
+	const userName = _.get(userIdentity, "sessionContext.sessionIssuer.userName");
 
 	const eventTime = _.get(detail, "eventTime");
 	const eventName = _.get(detail, "eventName");
