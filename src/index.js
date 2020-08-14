@@ -74,6 +74,7 @@ class LambdaHandler {
 						return null;// never send empty message
 					}
 
+					console.log(`Successful processing of message by ${parserName}`);
 					return { parser, parserName, slackMessage: message };
 				}
 			}

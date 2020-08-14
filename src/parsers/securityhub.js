@@ -59,21 +59,26 @@ exports.parse = event => {
 	const detail = event.get("detail");
 	console.log(`Detail ${JSON.stringify(detail, null, 2)}`);
 
-	const id = _.get(detail, "id");
-	const generatorId = _.get(detail, "GeneratorId");
-	const title = _.get(detail, "Title");
-	const description = _.get(detail, "description");
-	const createdAt = new Date(_.get(detail, "UpdatedAt"));
-	const firstSeen = new Date(_.get(detail, "FirstObservedAt"));
-	const lastSeen = new Date(_.get(detail, "LastObservedAt"));
-	// const severity = _.get(detail, "Severity");
-	const severity = _.get(detail, "severity.normalized");
-	const criticality = _.get(detail, "Criticality");
+	const finding = detail.get(findings)[0];
+	console.log(`Fetail ${JSON.stringify(finding, null, 2)}`);
 
-	const accountId = _.get(detail, "AwsAccountId");
-	const resources = _.get(detail, "resources");
-	const recomendationText = _.get(detail, "Remediation.Recommendation.Text");
-	const recomendationLink = _.get(detail, "Remediation.Recommendation.Url");
+	const id = _.get(finding, "Id");
+	const generatorId = _.get(finding, "GeneratorId");
+	const title = _.get(finding, "Title");
+	const description = _.get(finding, "Description");
+	const createdAt = new Date(_.get(finding, "CreatedAt"));
+	const updatedAt = new Date(_.get(finding, "UpdatedAt"));
+	const firstSeen = new Date(_.get(finding, "FirstObservedAt"));
+	const lastSeen = new Date(_.get(finding, "LastObservedAt"));
+	const complianceStatus = _.get(finding, "Compliance.Status");
+	const severity = _.get(finding, "Severity.Normalized");
+	const severityLabel = _.get(finding, "Severity.Label");
+	const criticality = _.get(finding, "Criticality");
+
+	const accountId = _.get(finding, "AwsAccountId");
+	const resources = _.get(finding, "Resources");
+	const recomendationText = _.get(finding, "Remediation.Recommendation.Text");
+	const recomendationLink = _.get(finding, "Remediation.Recommendation.Url");
 
 	const fields = [];
 
