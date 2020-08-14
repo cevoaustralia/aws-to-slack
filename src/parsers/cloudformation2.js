@@ -53,13 +53,19 @@ exports.parse = event => {
 
 	fields.push({
 		title: "Invoked by",
-		value: userName || userPrincipal,
-		short: true
+		value: `${userPrincipal} - ${userName}`,
+		short: false
 	});
 
 	if (requestParameters) {
 		for (var name in requestParameters) {
 			const value = requestParameters[name];
+
+			if (value === "parameters" ||
+				value === "capabilities" ||
+				value === "notificationARNs") {
+				continue;
+			}
 
 			fields.push({
 				title: name,
