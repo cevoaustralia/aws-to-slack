@@ -57,6 +57,7 @@ exports.parse = event => {
 
 			if (name === "parameters" ||
 				name === "capabilities" ||
+				name === "usePreviousTemplate" ||
 				name === "notificationARNs") {
 				continue;
 			}
