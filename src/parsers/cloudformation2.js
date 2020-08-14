@@ -66,12 +66,13 @@ exports.parse = event => {
 				value === "notificationARNs") {
 				continue;
 			}
-
-			fields.push({
-				title: name,
-				value: value,
-				short: true
-			});
+			else {
+				fields.push({
+					title: name,
+					value: value,
+					short: true
+				});
+			}
 		}
 	}
 
