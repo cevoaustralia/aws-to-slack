@@ -6,6 +6,8 @@
 exports.matches = () => true; // Match every event
 
 exports.parse = event => {
+	console.log(`Event ${JSON.stringify(event, null, 2)}`);
+
 	// Clone object so we can delete known keys
 	const msg = _.clone(event.message);
 	const fallback = JSON.stringify(event.record, null, 2);

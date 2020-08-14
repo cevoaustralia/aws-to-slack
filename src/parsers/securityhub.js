@@ -6,53 +6,6 @@ exports.matches = event =>
 	|| _.get(event.message, "detail.service.serviceName") === "securityhub";
 
 
-// account
-// detail-type
-// detail.findings.0.AwsAccountId
-// detail.findings.0.Compliance.Status
-// detail.findings.0.CreatedAt
-// detail.findings.0.Description
-// detail.findings.0.FirstObservedAt
-// detail.findings.0.GeneratorId
-// detail.findings.0.Id
-// detail.findings.0.LastObservedAt
-// detail.findings.0.ProductArn
-// detail.findings.0.ProductFields.aws/securityhub/CompanyName
-// detail.findings.0.ProductFields.aws/securityhub/FindingId
-// detail.findings.0.ProductFields.aws/securityhub/ProductName
-// detail.findings.0.ProductFields.aws/securityhub/SeverityLabel
-// detail.findings.0.ProductFields.ControlId
-// detail.findings.0.ProductFields.RecommendationUrl
-// detail.findings.0.ProductFields.RelatedAWSResources:0/name
-// detail.findings.0.ProductFields.RelatedAWSResources:0/type
-// detail.findings.0.ProductFields.StandardsArn
-// detail.findings.0.ProductFields.StandardsControlArn
-// detail.findings.0.ProductFields.StandardsSubscriptionArn
-// detail.findings.0.RecordState
-// detail.findings.0.Remediation.Recommendation.Text
-// detail.findings.0.Remediation.Recommendation.Url
-// detail.findings.0.Resources.0.Id
-// detail.findings.0.Resources.0.Partition
-// detail.findings.0.Resources.0.Region
-// detail.findings.0.Resources.0.Type
-// detail.findings.0.SchemaVersion
-// detail.findings.0.Severity.Label
-// detail.findings.0.Severity.Normalized
-// detail.findings.0.Severity.Original
-// detail.findings.0.Severity.Product
-// detail.findings.0.Title
-// detail.findings.0.Types.0
-// detail.findings.0.UpdatedAt
-// detail.findings.0.Workflow.Status
-// detail.findings.0.WorkflowState
-// id
-// region
-// resources.0
-// source
-// time
-// version
-
-
 exports.parse = event => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
@@ -60,7 +13,7 @@ exports.parse = event => {
 	console.log(`Detail ${JSON.stringify(detail, null, 2)}`);
 
 	const finding = detail.get(findings)[0];
-	console.log(`Fetail ${JSON.stringify(finding, null, 2)}`);
+	console.log(`Finding ${JSON.stringify(finding, null, 2)}`);
 
 	const id = _.get(finding, "Id");
 	const generatorId = _.get(finding, "GeneratorId");
