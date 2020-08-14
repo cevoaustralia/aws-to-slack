@@ -7,14 +7,14 @@ exports.matches = event =>
 exports.parse = event => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
-	const version = _.get(event, "version");
-	const id = _.get(event, "id");
-	const source = _.get(event, "source");
-	const account = _.get(event, "account");
-	const time = _.get(event, "time");
-	const region = _.get(event, "region");
+	const version = event.get("version");
+	const id = event.get("id");
+	const source = event.get("source");
+	const account = event.get("account");
+	const time = event.get("time");
+	const region = event.get("region");
 
-	const detail = _.get(event, "detail");
+	const detail = event.get("detail");
 
 	const userIdentity = _.get(detail, "userIdentity");
 	const userPrincipal = _.get(userIdentity, "principalId");
