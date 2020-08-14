@@ -7,58 +7,66 @@ exports.matches = event =>
 exports.parse = event => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
-	// Split the incoming message into individual fields for easier parsing
-	const lines = _.split(event.message, "\n");
-	const messageObj = _.reduce(lines, (returnObj, line) => {
-		if (!_.isEmpty(line) && _.includes(line, "=")) {
-			const key = _.trim(line.substr(0, line.indexOf("=")));
-			const value = _.trim(line.substr(key.length + 1), "'");
-			return _.extend(returnObj, { [key]: value });
-		}
-		return returnObj;
-	}, {});
+	const message = event.get("message");
 
-	if (!_.has(messageObj, "LogicalResourceId") || !_.has(messageObj, "StackName")) {
-		// Doesn't seem like we can parse this - so not of interest for us
-		return false;
+	const version = _.get(message, "version");
+	const id = _.get(message, "id");
+	const source = _.get(message, "source");
+	const account = _.get(message, "account");
+	const time = _.get(message, "time");
+	const region = _.get(message, "region");
+
+	const detail = _.get(message, "detail");
+
+	const userIdentity = _.get(detail, "userIdentity");
+	const userPrincipal = _.get(userIdentity, "principalId");
+
+	const eventTime = _.get(detail, "eventTime");
+	const eventName = _.get(detail, "eventName");
+	const userAgent = _.get(detail, "userAgent");
+	const errorCode = _.get(detail, "errorCode");
+	const errorMessage = _.get(detail, "errorMessage");
+
+	const requestParameters = _.get(detail, "requestParameters");
+
+	const fields = [];
+
+	fields.push({
+		title: "Event Name",
+		value: eventName,
+		short: false
+	});
+
+	fields.push({
+		title: "Source",
+		value: userAgent,
+		short: true
+	});
+
+	if (errorMessage) {
+		fields.push({
+			title: errorCode,
+			value: errorMessage,
+			short: false
+		});
 	}
 
-	const logicalResourceId = _.get(messageObj, "LogicalResourceId");
-	const stackName = _.get(messageObj, "StackName");
+	let stackName = `Unknown`;
 
-	if (logicalResourceId !== stackName) {
-		// Message is about a resource in the stack, not the stack itself
-		// Ignore by returning truthy but empty message
-		return true;
+	if (requestParameters) {
+		stackName = _.get(requestParameters, "stackName");
 	}
 
-	const resourceStatus = _.get(messageObj, "ResourceStatus");
-	const stackId = _.get(messageObj, "StackId");
-	const time = _.get(messageObj, "Timestamp");
-	const title = _.get(statusMappings, `${resourceStatus}.title`);
-	const color = _.get(statusMappings, `${resourceStatus}.color`);
-
-	// Example StackId: arn:aws:cloudformation:{region}:{accountId}:stack/${stackName}/{stackUuid}
-	const region = event.parseArn(stackId).region || event.getRegion();
-	const encodedStackId = encodeURIComponent(stackId);
-	const consoleLink = event.consoleUrl(`/cloudformation/home?region=${region}#stacks/${encodedStackId}/events`);
+	const title = `${eventName}`;
 
 	return event.attachmentWithDefaults({
 		author_name: "AWS CloudFormation",
 		title: title,
-		title_link: consoleLink,
+		// title_link: consoleLink,
 		fallback: `${stackName}: ${title}`,
-		color: color,
+		// color: color,
 		ts: new Date(time),
-		fields: [{
-			title: "Stack Name",
-			value: stackName,
-			short: true,
-		}, {
-			title: "Status",
-			value: resourceStatus,
-			short: true,
-		}]
+		fields: fields
 	});
 };
 
