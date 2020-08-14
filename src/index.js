@@ -12,6 +12,7 @@ const _ = require("lodash")
 		"batch-events",
 		"beanstalk",
 		"cloudformation",
+		"cloudformation2",
 		"codebuild",
 		"codedeployCloudWatch",
 		"codedeploySns",
