@@ -34,12 +34,6 @@ exports.parse = event => {
 	const fields = [];
 
 	fields.push({
-		title: "Id",
-		value: `${id}`,
-		short: false
-	});
-
-	fields.push({
 		title: "Event Name",
 		value: `${eventName} (${awsRegion})`,
 		short: true
@@ -61,9 +55,9 @@ exports.parse = event => {
 		for (var name in requestParameters) {
 			const value = requestParameters[name];
 
-			if (value === "parameters" ||
-				value === "capabilities" ||
-				value === "notificationARNs") {
+			if (name === "parameters" ||
+				name === "capabilities" ||
+				name === "notificationARNs") {
 				continue;
 			}
 			else {
