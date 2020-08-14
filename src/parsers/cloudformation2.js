@@ -9,14 +9,14 @@ exports.parse = event => {
 
 	const message = event.message;
 
-	const version = message.get("version");
-	const id = message.get("id");
-	const source = message.get("source");
-	const account = message.get("account");
-	const time = message.get("time");
-	const region = message.get("region");
+	const version = _.get(message, "version");
+	const id = _.get(message, "id");
+	const source = _.get(message, "source");
+	const account = _.get(message, "account");
+	const time = _.get(message, "time");
+	const region = _.get(message, "region");
 
-	const detail = event.get("detail");
+	const detail = _.get(message, "detail");
 
 	const userIdentity = _.get(detail, "userIdentity");
 	const userPrincipal = _.get(userIdentity, "principalId");
