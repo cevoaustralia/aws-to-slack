@@ -12,7 +12,7 @@ exports.parse = event => {
 	const detail = event.get("detail");
 	console.log(`Detail ${JSON.stringify(detail, null, 2)}`);
 
-	const finding = detail.get(findings)[0];
+	const finding = detail.get("findings")[0];
 	console.log(`Finding ${JSON.stringify(finding, null, 2)}`);
 
 	const id = _.get(finding, "Id");
