@@ -1,3 +1,5 @@
+const SUPPRESS_ACCOUNT_TYPES=false;
+
 //
 // AWS SecurityHub event parser
 //
@@ -61,7 +63,7 @@ exports.parse = event => {
 
 	fields.push({
 		title: "Severity",
-		value: severity,
+		value: severityLabel,
 		short: true
 	});
 
@@ -77,31 +79,35 @@ exports.parse = event => {
 		short: true
 	});
 
-	// fields.push({
-	// 	title: "Affected Resource",
-	// 	value: `${resources[0].Type} - ${resources[0].Id}`,
-	// 	short: false
-	// });
-
 	fields.push({
 		title: "Recommendation",
 		value: `${recomendationLink} - ${recomendationText}`
 	});
 
 
-	// console.log(`Unknown GuardDuty resourceType '${resourceType}'`);
-	//
-	// fields.push({
-	// 	title: "Unknown Resource Type (" + resourceType + ")",
-	// 	value: JSON.stringify(_.get(event, "resource"), null, 2),
-	// 	short: false
-	// });
+	if (resources) {
+		const resourceType = _.get(resources[0], "Type");
+		const resourceId = _.get(resources[0], "Id");
+
+		if (SUPPRESS_ACCOUNT_TYPES) {
+			if ("AwsAccount" === resourceType) {
+				return true;
+			}
+		}
+
+		fields.push({
+			title: "Affected Resource",
+			value: `${resourceType} - ${resourceId}`,
+			short: false
+		});
+	}
+
 
 	let color = event.COLORS.neutral; //low severity below 50
-	if (criticality > 39) { //medium severity between 50 and 80
+	if (severity > 39) { //medium severity between 50 and 80
 		color = event.COLORS.warning;
 	}
-	if (criticality > 80) { //high severity above 80
+	if (severity > 80) { //high severity above 80
 		color = event.COLORS.critical;
 	}
 
