@@ -18,12 +18,19 @@ exports.parse = event => {
 
 	const eventName = _.get(detail, "eventName")
 
-	if (eventName === "ArchiveFindings") {
-		title = "Findings Archived"
+	if (eventName === "ArchiveFindings" || eventName === "UnarchiveFindings") {
 		let actionedBy = _.get(detail, "userIdentity.principalId")
 		accountId = _.get(detail, "recipientAccountId");
 		region = _.get(detail, "awsRegion");
+		title = "Findings Archived"
 		description = `Findings Archived by ${actionedBy}`
+		color = event.COLORS.ok;
+
+		if (eventName === "UnarchiveFindings") {
+			title = "Findings Unarchived"
+			description = `Findings Unarchived by ${actionedBy}`
+			color = event.COLORS.warning;
+		}
 
 		fields.push({
 			title: "Account",
@@ -38,9 +45,9 @@ exports.parse = event => {
 		});
 
 		fields.push({
-			title: "Archived by",
+			title: "Actioned by",
 			value: actionedBy,
-			short: true
+			short: false
 		});
 
 		const findings = _.get(detail, "requestParameters.findingIds");
@@ -49,7 +56,7 @@ exports.parse = event => {
 			fields.push({
 				title: "Finding ID",
 				value: finding,
-				short: true
+				short: false
 			});
 		}
 
