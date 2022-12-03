@@ -8,20 +8,62 @@ exports.matches = event =>
 exports.parse = event => {
 	const detail = event.get("detail");
 
-	//const id = _.get(detail, "id");
-	const title = _.get(detail, "title");
-	const description = _.get(detail, "description");
+	let title = _.get(detail, "title");
+	let description = _.get(detail, "description");
 	const createdAt = new Date(_.get(detail, "time"));
+	let accountId = _.get(detail, "accountId");
+	let region = _.get(detail, "region");
+	let color = event.COLORS.neutral; //low severity below 4
+	const fields = [];
+
+	const eventName = _.get(detail, "eventName")
+
+	if (eventName === "ArchiveFindings") {
+		title = "Findings Archived"
+		let actionedBy = _.get(detail, "userIdentity.principalId")
+		accountId = _.get(detail, "recipientAccountId");
+		region = _.get(detail, "awsRegion");
+		description = `Findings Archived by ${actionedBy}`
+
+		fields.push({
+			title: "Account",
+			value: accountId,
+			short: true
+		});
+
+		fields.push({
+			title: "Region",
+			value: region,
+			short: true
+		});
+
+		fields.push({
+			title: "Archived by",
+			value: actionedBy,
+			short: true
+		});
+
+		const findings = _.get(detail, "requestParameters.findingIds");
+
+		for (const finding of findings) {
+			fields.push({
+				title: "Finding ID",
+				value: finding,
+				short: true
+			});
+		}
+
+	}
+	else {
+
+	//const id = _.get(detail, "id");
 	const severity = _.get(detail, "severity");
-	const accountId = _.get(detail, "accountId");
-	const region = _.get(detail, "region");
 	//const partition = _.get(event, "partition");
 	//const arn = _.get(event, "arn");
 	const type = _.get(detail, "type");
 
 	const threatName = _.get(detail, "service.additionalInfo.threatName");
 	const threatListName = _.get(detail, "service.additionalInfo.threatListName");
-	const fields = [];
 
 	fields.push({
 		title: "Description",
@@ -281,12 +323,12 @@ exports.parse = event => {
 		});
 	}
 
-	let color = event.COLORS.neutral; //low severity below 4
 	if (severity > 4) { //medium seveirty between 4 and 7
 		color = event.COLORS.warning;
 	}
     	if (severity > 7) { //high sevirity above 7
 		color = event.COLORS.critical;
+	}
 	}
 
 	return event.attachmentWithDefaults({
