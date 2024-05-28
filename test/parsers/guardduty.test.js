@@ -39,7 +39,7 @@ mock.matchesEvent(simpleSnsPacket);
 
 mock.matchesEventWithDetail(simpleSnsPacket, {
 	"author_name": "Amazon GuardDuty",
-	"color": "warning",
+	"color": "#A8A8A8",
 	"fallback":"Unprotected port on EC2 instance i-blart is being probed. EC2 instance has an unprotected port which is being probed by a known malicious host.",
 	"title": "Unprotected port on EC2 instance i-blart is being probed.",
 });

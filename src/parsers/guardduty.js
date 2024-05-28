@@ -126,24 +126,26 @@ exports.parse = event => {
 	}
 	else if (actionType === "NETWORK_CONNECTION") {
 
-		const connectionDirection = _.get(detail, "service.action.networkConnectionAction.connectionDirection");
+		const detectedAction = _.get(detail, "service.action.networkConnectionAction");
 
-		const ipAddressV4 = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.ipAddressV4");
-		const isp = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.organization.isp");
-		const org = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.organization.org");
+		const connectionDirection = _.get(detectedAction, "connectionDirection");
+		const protocol = _.get(detectedAction, "protocol");
+		const blocked = _.get(detectedAction, "blocked");
 
-		const country = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.country.countryName");
-		const city = _.get(detail, "service.action.networkConnectionAction.remoteIpDetails.city.cityName");
+		const ipAddressV4 = _.get(detectedAction, "remoteIpDetails.ipAddressV4");
+		const isp = _.get(detectedAction, "remoteIpDetails.organization.isp");
+		const org = _.get(detectedAction, "remoteIpDetails.organization.org");
 
-		const remotePort = _.get(detail, "service.action.networkConnectionAction.remotePortDetails.port");
-		const remotePortName = _.get(detail, "service.action.networkConnectionAction.remotePortDetails.portName");
+		const country = _.get(detectedAction, "remoteIpDetails.country.countryName");
+		const city = _.get(detectedAction, "remoteIpDetails.city.cityName");
 
-		const localIpAddress = _.get(detail, "service.action.networkConnectionAction.localIpDetails.ipAddressV4");
-		const localPort = _.get(detail, "service.action.networkConnectionAction.localPortDetails.port");
-		const localPortName = _.get(detail, "service.action.networkConnectionAction.localPortDetails.portName");
+		const remotePort = _.get(detectedAction, "remotePortDetails.port");
+		const remotePortName = _.get(detectedAction, "remotePortDetails.portName");
 
-		const protocol = _.get(detail, "service.action.networkConnectionAction.protocol");
-		const blocked = _.get(detail, "service.action.networkConnectionAction.blocked");
+		const localIpAddress = _.get(detectedAction, "localIpDetails.ipAddressV4");
+		const localPort = _.get(detectedAction, "localPortDetails.port");
+		const localPortName = _.get(detectedAction, "localPortDetails.portName");
+
 
 		fields.push({
 			title: "Connection",
@@ -168,6 +170,39 @@ exports.parse = event => {
 		// 	value: `${remotePort} (${remotePortName})`,
 		// 	short: true
 		// });
+	}
+	else if (actionType === "KUBERNETES_API_CALL") {
+
+		const detectedAction = _.get(detail, "service.action.kubernetesApiCallAction");
+
+		const ipAddressV4 = _.get(detectedAction, "remoteIpDetails.ipAddressV4");
+		const isp = _.get(detectedAction, "remoteIpDetails.organization.isp");
+		const org = _.get(detectedAction, "remoteIpDetails.organization.org");
+
+		const country = _.get(detectedAction, "remoteIpDetails.country.countryName");
+		const city = _.get(detectedAction, "remoteIpDetails.city.cityName");
+
+		const verb = _.get(detectedAction, "verb");
+		const requestUri = _.get(detectedAction, "requestUri");
+
+		fields.push({
+			title: "Kubernetes API call",
+			value: `${verb} on ${requestUri}`,
+			short: false
+		});
+
+		fields.push({
+			title: "API origin",
+			value: `${ipAddressV4}\n${isp} - ${org}`,
+			short: true
+		});
+
+		fields.push({
+			title: "Location",
+			value: `${country} - ${city}`,
+			short: true
+		});
+
 	}
 	else {
 		console.log(`Unknown GuardDuty actionType '${actionType}'`);
@@ -238,7 +273,6 @@ exports.parse = event => {
 				short: true
 			});
 		}
-
 	}
 	else if (resourceType === "AccessKey") {
 
@@ -270,6 +304,66 @@ exports.parse = event => {
 			short: true
 		});
 
+	}
+	else if (resourceType === "EKSCluster") {
+		const cluster = _.get(detail, "resource.eksClusterDetails");
+
+		const name = _.get(cluster, "name");
+		const arn = _.get(cluster, "arn");
+		const createdAt = _.get(cluster, "createdAt");
+		const vpcId = _.get(cluster, "vpcId");
+		const status = _.get(cluster, "status");
+
+		fields.push({
+			title: "Cluster",
+			value: `${name} (${arn}) - ${status}`,
+			short: false
+		});
+
+		fields.push({
+			title: "VPC",
+			value: `${vpcId}`,
+			short: true
+		});
+
+		const kubernetesDetails = _.get(detail, "resource.kubernetesDetails")
+		const workloadDetails = _.get(kubernetesDetails, "kubernetesWorkloadDetails")
+		fields.push({
+			title: "Workload",
+			value: workloadDetails,
+			short: true
+		});
+		const userDetails = _.get(kubernetesDetails, "kubernetesUserDetails")
+
+		const username= _.get(userDetails, "username");
+		const uid = _.get(userDetails, "uid");
+		const groups = _.get(userDetails, "groups");
+		const sessionName = _.get(userDetails, "sessionName");
+
+		fields.push({
+			title: "User",
+			value: `${username}/${sessionName} (${uid})`,
+			short: true
+		});
+
+		fields.push({
+			title: "Groups",
+			value: `${groups}`,
+			short: true
+		});
+
+		const tags = _.get(cluster	, "tags");
+
+		for (let i = 0; i < tags.length; i++) {
+			const key = tags[i].key;
+			const value = tags[i].value;
+
+			fields.push({
+				title: key,
+				value: value,
+				short: true
+			});
+		}
 	}
 	else {
 		console.log(`Unknown GuardDuty resourceType '${resourceType}'`);
