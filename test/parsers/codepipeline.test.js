@@ -105,7 +105,7 @@ const exampleApprovalRequest = {
 		"pipelineName": "mypipeline.name",
 		"stageName": "Deploy",
 		"actionName": "Deploy_Approval",
-		"token": "abcdefgh-b2fb-1234-a00a-31a03b998faa",
+		"token": "EXAMPLE",
 		"expires": "2018-11-13T21:36Z",
 		"externalEntityLink": "https://my.reviewwebsite.com",
 		"approvalReviewLink": "https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/mypipeline.name/Deploy/Deploy_Approval/approve/abcdefgh-b2fb-1234-a00a-31a03b998faa",
