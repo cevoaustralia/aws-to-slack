@@ -56,7 +56,7 @@ Resources:
     Properties:
       Handler: src/index.handler
       Role: !GetAtt FunctionRole.Arn
-      Runtime: nodejs19.x
+      Runtime: nodejs20.x
       MemorySize: 256
       Timeout: 15 # Cross-region metrics lookup requires at least 10s
       ReservedConcurrentExecutions: 5

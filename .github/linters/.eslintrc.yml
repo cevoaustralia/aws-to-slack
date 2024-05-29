@@ -32,7 +32,7 @@ plugins:
 
 extends:
   - eslint:recommended
-  - plugin:github/recommended
+#  - plugin:github/recommended
   - plugin:jest/recommended
 
 rules:
