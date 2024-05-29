@@ -1,14 +1,13 @@
-const SUPPRESS_ACCOUNT_TYPES=false;
+const SUPPRESS_ACCOUNT_TYPES = false;
 
 //
 // AWS SecurityHub event parser
 //
-exports.matches = event =>
-	event.getSource() === "securityhub"
-	|| _.get(event.message, "detail.service.serviceName") === "securityhub";
+exports.matches = (event) =>
+	event.getSource() === "securityhub" ||
+	_.get(event.message, "detail.service.serviceName") === "securityhub";
 
-
-exports.parse = event => {
+exports.parse = (event) => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
 	const detail = event.get("detail");
@@ -40,13 +39,13 @@ exports.parse = event => {
 	fields.push({
 		title: "Description",
 		value: description,
-		short: false
+		short: false,
 	});
 
 	fields.push({
 		title: "Account",
 		value: accountId,
-		short: true
+		short: true,
 	});
 
 	// fields.push({
@@ -64,26 +63,25 @@ exports.parse = event => {
 	fields.push({
 		title: "Severity",
 		value: severityLabel,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "First Seen",
 		value: firstSeen,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "Last Seen",
 		value: lastSeen,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "Recommendation",
-		value: `${recomendationLink} - ${recomendationText}`
+		value: `${recomendationLink} - ${recomendationText}`,
 	});
-
 
 	if (resources) {
 		const resourceType = _.get(resources[0], "Type");
@@ -98,16 +96,17 @@ exports.parse = event => {
 		fields.push({
 			title: "Affected Resource",
 			value: `${resourceType} - ${resourceId}`,
-			short: false
+			short: false,
 		});
 	}
 
-
 	let color = event.COLORS.neutral; //low severity below 50
-	if (severity > 39) { //medium severity between 50 and 80
+	if (severity > 39) {
+		//medium severity between 50 and 80
 		color = event.COLORS.warning;
 	}
-	if (severity > 80) { //high severity above 80
+	if (severity > 80) {
+		//high severity above 80
 		color = event.COLORS.critical;
 	}
 

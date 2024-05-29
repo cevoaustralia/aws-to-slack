@@ -1,14 +1,13 @@
 /* global expect, test, jest */
 /* eslint lodash/prefer-lodash-typecheck:0 lodash/prefer-lodash-method:0 */
 
-const Handler = require("../../src/index")
-	, EventDef = require("../../src/eventdef");
+const Handler = require("../../src/index"),
+	EventDef = require("../../src/eventdef");
 
 /**
  * Helper class for creating tests around event parsing.
  */
 class ParserMock {
-
 	/**
 	 * Created instance for chainable calls.
 	 *
@@ -34,33 +33,36 @@ class ParserMock {
 			return String(Math.random() * 100000000).substr(0, digits);
 		}
 		return {
-			Records: [{
-				"EventSource": "aws:sns",
-				"EventVersion": "1.0",
-				"EventSubscriptionArn": "arn:aws:sns:region:9999999991:ExampleTopic:ExampleSubscriptionId",
-				"Sns": {
-					"Type": "Notification",
-					"TopicArn": "arn:aws:sns:region:9999999991:ExampleTopic",
-					"SignatureVersion": "1",
-					"Timestamp": `1970-0${rand(1)}-2${rand(1)}T0${rand(1)}:0${rand(1)}:0${rand(1)}.${rand(3)}Z`,
-					"Signature": "http://example.com/signature",
-					"SigningCertUrl": "http://example.com/signingcerturl",
-					"UnsubscribeUrl": "http://example.com/unsubscribeurl",
-					"Subject": subject || "TestInvoke",
-					"MessageId": `95df01b4-ee${rand(2)}-5cb9-9903-4c221d41${rand(4)}`,
-					"Message": message,
-					"MessageAttributes": {
-						"Test": {
-							"Type": "String",
-							"Value": "TestString"
+			Records: [
+				{
+					EventSource: "aws:sns",
+					EventVersion: "1.0",
+					EventSubscriptionArn:
+						"arn:aws:sns:region:9999999991:ExampleTopic:ExampleSubscriptionId",
+					Sns: {
+						Type: "Notification",
+						TopicArn: "arn:aws:sns:region:9999999991:ExampleTopic",
+						SignatureVersion: "1",
+						Timestamp: `1970-0${rand(1)}-2${rand(1)}T0${rand(1)}:0${rand(1)}:0${rand(1)}.${rand(3)}Z`,
+						Signature: "http://example.com/signature",
+						SigningCertUrl: "http://example.com/signingcerturl",
+						UnsubscribeUrl: "http://example.com/unsubscribeurl",
+						Subject: subject || "TestInvoke",
+						MessageId: `95df01b4-ee${rand(2)}-5cb9-9903-4c221d41${rand(4)}`,
+						Message: message,
+						MessageAttributes: {
+							Test: {
+								Type: "String",
+								Value: "TestString",
+							},
+							TestBinary: {
+								Type: "Binary",
+								Value: "TestBinary",
+							},
 						},
-						"TestBinary": {
-							"Type": "Binary",
-							"Value": "TestBinary"
-						}
 					},
 				},
-			}]
+			],
 		};
 	}
 
@@ -89,10 +91,12 @@ class ParserMock {
 		describe(`Parser-Mock: ${this.name}`, () => {
 			test("parser exists", () => {
 				const parser = require(`../../src/parsers/${this.name}`);
-				expect(parser).toEqual(expect.objectContaining({
-					parse: expect.any(Function),
-					matches: expect.any(Function),
-				}));
+				expect(parser).toEqual(
+					expect.objectContaining({
+						parse: expect.any(Function),
+						matches: expect.any(Function),
+					}),
+				);
 			});
 
 			test("parser.parse() is called", async () => {
@@ -123,9 +127,11 @@ class ParserMock {
 				expect(msg).toBeTruthy();
 				// Confirm basic response structure
 				//TODO: this is pretty restrictive, what if parsers create fancy events?
-				expect(msg).toEqual(expect.objectContaining({
-					attachments: [expect.any(Object)],
-				}));
+				expect(msg).toEqual(
+					expect.objectContaining({
+						attachments: [expect.any(Object)],
+					}),
+				);
 				//TODO: this is a bad assumption -- there's no limit on number of attachments
 				expect(msg.attachments).toHaveLength(1);
 			});
@@ -283,7 +289,9 @@ class ParserMock {
 	 * @returns {ParserMock} Returns self for chain-able stacks
 	 */
 	willStopHandlerWithSnsEvent(message, subject) {
-		this.willStopHandlerWithEvent(ParserMock.snsMessageToEvent(message, subject));
+		this.willStopHandlerWithEvent(
+			ParserMock.snsMessageToEvent(message, subject),
+		);
 		return this;
 	}
 }

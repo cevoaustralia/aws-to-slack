@@ -5,20 +5,20 @@
 import { CloudWatch } from "aws-sdk";
 
 export interface ChartConfig {
-	metrics: ChartMetricConfig[];
+  metrics: ChartMetricConfig[];
 
-	width: number;
-	height: number;
-	timeOffset: number;
-	timePeriod: number;
-	chartSamples?: number;
+  width: number;
+  height: number;
+  timeOffset: number;
+  timePeriod: number;
+  chartSamples?: number;
 }
 
 export interface ChartMetricConfig {
-	title: string;
-	color?: string;
-	thickness?: number;
-	dashed?: boolean|string;
-	query: CloudWatch.Types.GetMetricStatisticsInput;
-	threshold?: number;
+  title: string;
+  color?: string;
+  thickness?: number;
+  dashed?: boolean | string;
+  query: CloudWatch.Types.GetMetricStatisticsInput;
+  threshold?: number;
 }

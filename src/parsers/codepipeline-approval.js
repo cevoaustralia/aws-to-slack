@@ -1,11 +1,11 @@
 //
 // AWS CodePipeline Approval Stage parser
 //
-exports.matches = event =>
-	_.has(event.message, "consoleLink")
-	&& _.has(event.message, "approval.pipelineName");
+exports.matches = (event) =>
+	_.has(event.message, "consoleLink") &&
+	_.has(event.message, "approval.pipelineName");
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const consoleLink = event.get("consoleLink");
 	const approval = event.get("approval", {});
 	const pipeline = approval.pipelineName;
@@ -21,15 +21,12 @@ exports.parse = event => {
 	let hrs;
 	if (numHours < 0.001) {
 		hrs = `*${Math.ceil(numHours)} ago!*`;
-	}
-	else if (numHours < 1) {
+	} else if (numHours < 1) {
 		hrs = `within *${Math.round(numHours * 60)} minutes*`;
-	}
-	else if (numHours < 40) {
+	} else if (numHours < 40) {
 		hrs = `within ${Math.ceil(numHours)} hours`;
-	}
-	else {
-		hrs = `within ${Math.ceil(numHours/24)} days`;
+	} else {
+		hrs = `within ${Math.ceil(numHours / 24)} days`;
 	}
 
 	let text = `Approval required ${hrs} for ${stage} / ${action}`;
@@ -45,14 +42,17 @@ exports.parse = event => {
 		fallback: `${pipeline} >> APPROVAL REQUIRED`,
 		color: event.COLORS.warning,
 		mrkdwn: true,
-		fields: [{
-			title: "Review URL",
-			value: reviewLink,
-			short: true
-		}, {
-			title: "Approval URL",
-			value: approveLink,
-			short: true
-		}],
+		fields: [
+			{
+				title: "Review URL",
+				value: reviewLink,
+				short: true,
+			},
+			{
+				title: "Approval URL",
+				value: approveLink,
+				short: true,
+			},
+		],
 	});
 };

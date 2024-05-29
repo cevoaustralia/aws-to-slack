@@ -1,12 +1,15 @@
-const url = require("url")
-	, https = require("https")
-	, AWS = require("aws-sdk")
-	, _ = require("lodash");
+const url = require("url"),
+	https = require("https"),
+	AWS = require("aws-sdk"),
+	_ = require("lodash");
 
 /** The Slack hook URL */
-const hookUrlPromise = shouldDecryptBlob(process.env.SLACK_HOOK_URL, s =>
-	// URL should be 78-80 characters long when decrypted
-	s.length > 100 && !/https?:\/\/\w/.test(s));
+const hookUrlPromise = shouldDecryptBlob(
+	process.env.SLACK_HOOK_URL,
+	(s) =>
+		// URL should be 78-80 characters long when decrypted
+		s.length > 100 && !/https?:\/\/\w/.test(s),
+);
 
 /** The Slack channel to send a message to stored in the slackChannel environment variable */
 const slackChannelPromise = shouldDecryptBlob(process.env.SLACK_CHANNEL);
@@ -19,24 +22,27 @@ const slackChannelPromise = shouldDecryptBlob(process.env.SLACK_CHANNEL);
  * @returns {Promise<string>} Resolved decrypted value, or raw value if fails
  */
 function shouldDecryptBlob(blob, isValid) {
-	return new Promise(resolve => {
-		if (_.isString(blob)
+	return new Promise((resolve) => {
+		if (
+			_.isString(blob) &&
 			// encrypted values are usually 250+ characters
-			&& blob.length > 50 && !_.includes(blob, " ")
-			&& (!isValid || isValid(blob))
+			blob.length > 50 &&
+			!_.includes(blob, " ") &&
+			(!isValid || isValid(blob))
 		) {
 			const kmsClient = new AWS.KMS();
-			kmsClient.decrypt({ CiphertextBlob: Buffer.from(blob, "base64") }, (err, data) => {
-				if (err) {
-					console.error("Error decrypting (using as-is):", err);
-					resolve(blob);
-				}
-				else {
-					resolve(data.Plaintext.toString("ascii"));
-				}
-			});
-		}
-		else {
+			kmsClient.decrypt(
+				{ CiphertextBlob: Buffer.from(blob, "base64") },
+				(err, data) => {
+					if (err) {
+						console.error("Error decrypting (using as-is):", err);
+						resolve(blob);
+					} else {
+						resolve(data.Plaintext.toString("ascii"));
+					}
+				},
+			);
+		} else {
 			// use as-is
 			resolve(blob);
 		}
@@ -54,7 +60,7 @@ class Slack {
 	 * @returns {Integer} Epoch time
 	 */
 	static toEpochTime(date) {
-		return date.getTime() / 1000 | 0;
+		return (date.getTime() / 1000) | 0;
 	}
 
 	/**
@@ -79,7 +85,9 @@ class Slack {
 				return response;
 			}
 			if (400 <= statusCode && statusCode < 500) {
-				const e = new Error(`Slack API reports bad request [HTTP:${response.statusCode}] ${response.statusMessage}: ${response.body}`);
+				const e = new Error(
+					`Slack API reports bad request [HTTP:${response.statusCode}] ${response.statusMessage}: ${response.body}`,
+				);
 				e.retryable = false;
 				throw e;
 			}
@@ -93,9 +101,9 @@ class Slack {
  * Set of predefined colors for different alert levels
  */
 Slack.COLORS = {
-	critical: "danger",  // "#FF324D",
+	critical: "danger", // "#FF324D",
 	warning: "warning", // "#FFD602",
-	ok: "good",    // "#8CC800",
+	ok: "good", // "#8CC800",
 	accent: "#1E90FF",
 	neutral: "#A8A8A8",
 };
@@ -107,7 +115,7 @@ Slack.COLORS = {
  * @returns {Promise<any>} _nothing_
  */
 function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -120,15 +128,17 @@ function sleep(ms) {
  */
 async function retry(retries, func) {
 	let numTries = 0;
-	for (; ;) {
+	for (;;) {
 		try {
 			return await func();
-		}
-		catch (e) {
+		} catch (e) {
 			if ((_.isUndefined(e.retryable) || e.retryable) && ++numTries < retries) {
 				// Exponential back-off
 				const waitFor = Math.pow(2, numTries) * 200;
-				console.error(`[ERROR-Retryable] attempt#${numTries}, waiting ${waitFor}ms]:`, e);
+				console.error(
+					`[ERROR-Retryable] attempt#${numTries}, waiting ${waitFor}ms]:`,
+					e,
+				);
 				await sleep(waitFor);
 				continue;
 			}
@@ -155,7 +165,7 @@ function postJson(data, endpoint) {
 		};
 		options.timeout = 3500;
 
-		const postReq = https.request(options, res => {
+		const postReq = https.request(options, (res) => {
 			const chunks = [];
 			res.setEncoding("utf8");
 			res.on("data", chunks.push.bind(chunks));

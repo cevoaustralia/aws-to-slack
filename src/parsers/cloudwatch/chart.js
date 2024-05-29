@@ -61,23 +61,25 @@
 	```
 */
 
-const AWS = require("aws-sdk")
-	, _ = require("lodash");
+const AWS = require("aws-sdk"),
+	_ = require("lodash");
 
 // @see https://developers.google.com/chart/image/docs/data_formats
 const extendedEncode = (() => {
-	const EXTENDED_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.";
+	const EXTENDED_MAP =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.";
 	const EXTENDED_MAP_LEN = EXTENDED_MAP.length;
 
 	return (num, maxVal) => {
 		// implicit convert to number
 		num = +num;
 		// Scale the value to maxVal.
-		const scaledVal = Math.floor(EXTENDED_MAP_LEN * EXTENDED_MAP_LEN * num / maxVal);
-		if (scaledVal > (EXTENDED_MAP_LEN * EXTENDED_MAP_LEN) - 1) {
+		const scaledVal = Math.floor(
+			(EXTENDED_MAP_LEN * EXTENDED_MAP_LEN * num) / maxVal,
+		);
+		if (scaledVal > EXTENDED_MAP_LEN * EXTENDED_MAP_LEN - 1) {
 			return "..";
-		}
-		else if (scaledVal < 0) {
+		} else if (scaledVal < 0) {
 			return "__";
 		}
 		// Calculate first and second digits and add them to the output.
@@ -91,7 +93,6 @@ const extendedEncode = (() => {
  *
  */
 class AwsCloudWatchChart {
-
 	/**
 	 * @param {{}} [config] Configuration object
 	 * @returns {Promise} Success or failure only
@@ -108,7 +109,7 @@ class AwsCloudWatchChart {
 			if (config.accessKeyId && config.secretAccessKey) {
 				AWS.config.update({
 					accessKeyId: config.accessKeyId,
-					secretAccessKey: config.secretAccessKey
+					secretAccessKey: config.secretAccessKey,
 				});
 				return resolve();
 			}
@@ -117,15 +118,17 @@ class AwsCloudWatchChart {
 			AWS.CredentialProviderChain.defaultProviders = [
 				() => new AWS.EnvironmentCredentials("AWS"),
 				() => new AWS.EnvironmentCredentials("AMAZON"),
-				() => new AWS.SharedIniFileCredentials({ profile: config.profile || "default" }),
+				() =>
+					new AWS.SharedIniFileCredentials({
+						profile: config.profile || "default",
+					}),
 				() => new AWS.EC2MetadataCredentials(),
 			];
 
-			(new AWS.CredentialProviderChain()).resolve((err, cred) => {
+			new AWS.CredentialProviderChain().resolve((err, cred) => {
 				if (err) {
 					reject(err);
-				}
-				else {
+				} else {
 					AWS.config.credentials = cred;
 					resolve();
 				}
@@ -190,16 +193,22 @@ class AwsCloudWatchChart {
 
 		fromTime.setTime(toTime.getTime() - this.timeOffset * 1000);
 
-		query = _.assign({
-			EndTime: toTime,
-			StartTime: fromTime,
-			Period: this.timePeriod, // in seconds
-		}, query);
+		query = _.assign(
+			{
+				EndTime: toTime,
+				StartTime: fromTime,
+				Period: this.timePeriod, // in seconds
+			},
+			query,
+		);
 
 		const result = await this.cloudwatch.getMetricStatistics(query).promise();
 
 		if (!result.Datapoints.length) {
-			console.log("CloudWatch.getMetricStatics resulted in no datapoints:", JSON.stringify(query));
+			console.log(
+				"CloudWatch.getMetricStatics resulted in no datapoints:",
+				JSON.stringify(query),
+			);
 		}
 		return result.Datapoints;
 	}
@@ -214,7 +223,9 @@ class AwsCloudWatchChart {
 			MetricName: query.MetricName,
 			Dimensions: query.Dimensions,
 		};
-		const result = await this.cloudwatch.describeAlarmsForMetric(params).promise();
+		const result = await this.cloudwatch
+			.describeAlarmsForMetric(params)
+			.promise();
 		return _.get(result, "MetricAlarms[0]");
 	}
 
@@ -252,22 +263,20 @@ class AwsCloudWatchChart {
 		return result.Metrics;
 	}
 
-
 	async save(filename) {
 		const fs = require("fs");
 		const file = fs.createWriteStream(filename);
 
 		try {
 			// wait for file-close
-			await new Promise(resolve => {
+			await new Promise((resolve) => {
 				file.on("finish", () => {
 					file.close(() => resolve(filename)); // close() is async,
 				});
 			});
 
 			(await this.getAsStream()).pipe(file);
-		}
-		catch (err) {
+		} catch (err) {
 			fs.unlink(filename);
 			throw err;
 		}
@@ -275,9 +284,7 @@ class AwsCloudWatchChart {
 
 	getAsStream() {
 		return new Promise((resolve, reject) => {
-			require("https")
-				.get(this.getURL(), resolve)
-				.on("error", reject);
+			require("https").get(this.getURL(), resolve).on("error", reject);
 		});
 	}
 
@@ -288,18 +295,21 @@ class AwsCloudWatchChart {
 	getTimeSlots() {
 		let toTime = 0;
 		let fromTime = Date.now();
-		const validDatapoints = _.filter(this.metrics, m => m.datapoints.length);
+		const validDatapoints = _.filter(this.metrics, (m) => m.datapoints.length);
 		if (!validDatapoints.length) {
 			throw "No datapoints returned from CloudWatch, cannot render empty chart";
 		}
 
-		_.each(validDatapoints, m => {
+		_.each(validDatapoints, (m) => {
 			// Turn strings into MsEpoch numbers, excluding un-parsable values
-			const dates = _.compact(_.map(m.datapoints, s => +new Date(s.Timestamp)));
+			const dates = _.compact(
+				_.map(m.datapoints, (s) => +new Date(s.Timestamp)),
+			);
 			toTime = Math.max(_.max(dates), toTime);
 			fromTime = Math.min(_.min(dates), fromTime);
 		});
-		if (fromTime < 99 || toTime < 99) { // should be very large numbers
+		if (fromTime < 99 || toTime < 99) {
+			// should be very large numbers
 			throw "Cannot render a chart without timeframe";
 		}
 
@@ -314,14 +324,18 @@ class AwsCloudWatchChart {
 		}
 
 		const timeSlots = [];
-		for (let i = fromTime; i <= toTime;) {
+		for (let i = fromTime; i <= toTime; ) {
 			const from = i;
-			i += ((toTime - fromTime) / chartSamples);
+			i += (toTime - fromTime) / chartSamples;
 			const to = i;
 			const d = new Date(to);
 			timeSlots.push({
-				text: ("0" + d.getUTCHours()).slice(-2) + ":" + ("0" + d.getUTCMinutes()).slice(-2),
-				from, to,
+				text:
+					("0" + d.getUTCHours()).slice(-2) +
+					":" +
+					("0" + d.getUTCMinutes()).slice(-2),
+				from,
+				to,
 			});
 		}
 
@@ -346,7 +360,8 @@ class AwsCloudWatchChart {
 				.find(["query.Namespace", "AWS/Lambda"])
 				.get("query.Dimensions")
 				.find(["Name", "FunctionName"])
-				.get("Value").value();
+				.get("Value")
+				.value();
 			if (lambdaFunctionName) {
 				logGroupName = `/aws/lambda/${lambdaFunctionName}`;
 			}
@@ -378,23 +393,31 @@ class AwsCloudWatchChart {
 		endTime.setUTCHours(eventHour + 1);
 		const logsTimeRange = {
 			start: startTime.toISOString(),
-			end: endTime.toISOString()
+			end: endTime.toISOString(),
 		};
 
 		region = region ? `region=${region}` : "";
 
-		return `https://console.aws.amazon.com/cloudwatch/home?${region}`
-			+ `#logEventViewer:group=${encodeURIComponent(logGroupName)}`
-			+ (filterPattern ? `;filter=${encodeURIComponent(filterPattern)}` : "")
-			+ `;start=${logsTimeRange.start};end=${logsTimeRange.end}`;
+		return (
+			`https://console.aws.amazon.com/cloudwatch/home?${region}` +
+			`#logEventViewer:group=${encodeURIComponent(logGroupName)}` +
+			(filterPattern ? `;filter=${encodeURIComponent(filterPattern)}` : "") +
+			`;start=${logsTimeRange.start};end=${logsTimeRange.end}`
+		);
 	}
 
 	getURL() {
 		if (!this.metrics) {
 			throw "No metrics have been defined";
 		}
-		if (this.width > 1000 || this.height > 1000 || this.height * this.width > 300000) {
-			throw new Error("Maximum value for width or height is 1,000. Width x height cannot exceed 300,000.");
+		if (
+			this.width > 1000 ||
+			this.height > 1000 ||
+			this.height * this.width > 300000
+		) {
+			throw new Error(
+				"Maximum value for width or height is 1,000. Width x height cannot exceed 300,000.",
+			);
 		}
 		if (this.width < 1 || this.height < 1) {
 			throw new Error("Invalid width and height parameters");
@@ -408,56 +431,68 @@ class AwsCloudWatchChart {
 		const labels = (() => {
 			const numLabels = this.width / 50;
 			const freq = Math.floor(timeSlots.length / numLabels);
-			return _.map(_.filter(timeSlots,
-				// always include the right-most slot
-				(slot, i) => (timeSlots.length - 1 - i) % freq === 0
-			), slot => slot.text);
+			return _.map(
+				_.filter(
+					timeSlots,
+					// always include the right-most slot
+					(slot, i) => (timeSlots.length - 1 - i) % freq === 0,
+				),
+				(slot) => slot.text,
+			);
 		})();
 
-		const datasets = _.map(this.metrics, m =>
-			_.map(timeSlots, timeSlot => {
+		const datasets = _.map(this.metrics, (m) =>
+			_.map(timeSlots, (timeSlot) => {
 				// limit to points that appear within this time slice
-				const datapoints = _.filter(m.datapoints, stat => {
+				const datapoints = _.filter(m.datapoints, (stat) => {
 					const d = +new Date(stat.Timestamp);
 					return d > timeSlot.from && d <= timeSlot.to;
 				});
 
 				if (m.query.ExtendedStatistics) {
 					// Support percentiles
-					const points = _.map(datapoints, stat => stat.ExtendedStatistics[0].value);
+					const points = _.map(
+						datapoints,
+						(stat) => stat.ExtendedStatistics[0].value,
+					);
 					return _.max(points);
 				}
 
 				const statName = m.query.Statistics[0];
 				// get relevant numbers only
-				const points = _.map(datapoints, stat => stat[statName]);
+				const points = _.map(datapoints, (stat) => stat[statName]);
 
 				switch (statName) {
-				case "Maximum": return _.max(points);
-				case "Minimum": return _.min(points);
-				case "Average": return _.sum(points) / (points.length || 1);
-				case "SampleCount":
-				case "Sum": return _.sum(points);
-				default: return null;
+					case "Maximum":
+						return _.max(points);
+					case "Minimum":
+						return _.min(points);
+					case "Average":
+						return _.sum(points) / (points.length || 1);
+					case "SampleCount":
+					case "Sum":
+						return _.sum(points);
+					default:
+						return null;
 				}
-			}));
+			}),
+		);
 
 		const absMaxValue = _.reduce(datasets, (n, d) => Math.max(n, _.max(d)), 0);
-		const topEdge = Math.ceil(absMaxValue*1.05);
+		const topEdge = Math.ceil(absMaxValue * 1.05);
 
-		const points = _.map(datasets, d => this.extendedEncodeArr(d, topEdge));
-		const colors = _.map(this.metrics, m => m.color);
-		const styles = _.map(this.metrics, m => m.dashed ? `${m.thickness},5,5` : m.thickness);
+		const points = _.map(datasets, (d) => this.extendedEncodeArr(d, topEdge));
+		const colors = _.map(this.metrics, (m) => m.color);
+		const styles = _.map(this.metrics, (m) =>
+			m.dashed ? `${m.thickness},5,5` : m.thickness,
+		);
 		const titles = _.invokeMap(this.metrics, "getTitle");
 
 		// Add threshold markers
-		_.each(this.metrics, m => {
+		_.each(this.metrics, (m) => {
 			if (m.threshold <= topEdge) {
 				// fill data array with static value
-				const pointArray = _.fill(
-					new Array(timeSlots.length),
-					m.threshold
-				);
+				const pointArray = _.fill(new Array(timeSlots.length), m.threshold);
 				points.push(this.extendedEncodeArr(pointArray, topEdge));
 				colors.push("FF0000");
 				styles.push(".5,5,5");
@@ -473,12 +508,16 @@ class AwsCloudWatchChart {
 			"chxl=0:|" + _.join(labels, "|"),
 			"chco=" + _.join(colors, ","), // line colors
 			"chls=" + _.join(styles, "|"), // line style <thickness,dash-length,space-length>|...
-			"chs=" + this.width+"x"+this.height,
+			"chs=" + this.width + "x" + this.height,
 			// axis scale (must be separate from data scale)
-			"chxr=1,0," + topEdge + "," + Math.floor(topEdge / this.height * 20),
+			"chxr=1,0," + topEdge + "," + Math.floor((topEdge / this.height) * 20),
 			"chg=20,10,1,5",
 			// Legend
-			"chdl=" + _.join(_.map(titles, t => encodeURIComponent(t)), "|"),
+			"chdl=" +
+				_.join(
+					_.map(titles, (t) => encodeURIComponent(t)),
+					"|",
+				),
 			"chdlp=b", // put legend at bottom
 			// Data (last in case of truncation)
 			"chd=e:" + _.join(points, ","),
@@ -494,7 +533,10 @@ class AwsCloudWatchChart {
 	 * @private
 	 */
 	extendedEncodeArr(arr, maxVal) {
-		return _.join(_.map(arr, n => extendedEncode(n, maxVal)), "");
+		return _.join(
+			_.map(arr, (n) => extendedEncode(n, maxVal)),
+			"",
+		);
 	}
 }
 
@@ -528,17 +570,16 @@ class AwsCloudWatchChartMetric {
 
 		// Support p99 statistics
 		const stats = this.query.Statistics;
-		const percentiles = _.filter(stats, s => /^p\d\d/i.test(s));
+		const percentiles = _.filter(stats, (s) => /^p\d\d/i.test(s));
 		if (percentiles.length) {
 			if (percentiles.length < stats.length) {
 				throw "Can only use p00.00 -or- normal statistics, not both!";
 			}
 			this.query.ExtendedStatistics = percentiles;
 			delete this.query.Statistics;
-		}
-		else {
+		} else {
 			// Format for Statistics is {upper-case-letter}{lower-case-word}
-			this.query.Statistics = _.map(stats, s => {
+			this.query.Statistics = _.map(stats, (s) => {
 				const lower = _.toLower(s);
 				if (lower === "samplecount") {
 					return "SampleCount"; // fix capitalization

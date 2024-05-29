@@ -3,9 +3,9 @@
 //
 const AWS = require("aws-sdk");
 
-exports.matches = event =>
-	event.getSource() === "codecommit"
-	&& _.get(event.message, "detail-type") === "CodeCommit Repository State Change";
+exports.matches = (event) =>
+	event.getSource() === "codecommit" &&
+	_.get(event.message, "detail-type") === "CodeCommit Repository State Change";
 
 exports.parse = async (event) => {
 	const callerArn = event.get("detail.callerUserArn");
@@ -20,20 +20,15 @@ exports.parse = async (event) => {
 	let title = repoName;
 	if (repoEvent === "referenceCreated" && refType === "branch") {
 		title = `New branch created in repository ${repoName}`;
-	}
-	else if (repoEvent === "referenceUpdated" && refType === "branch") {
+	} else if (repoEvent === "referenceUpdated" && refType === "branch") {
 		title = `New commit pushed to repository ${repoName}`;
-	}
-	else if (repoEvent === "referenceDeleted" && refType === "branch") {
+	} else if (repoEvent === "referenceDeleted" && refType === "branch") {
 		title = `Deleted branch in repository ${repoName}`;
-	}
-	else if (repoEvent === "referenceCreated" && refType === "tag") {
+	} else if (repoEvent === "referenceCreated" && refType === "tag") {
 		title = `New tag created in repository ${repoName}`;
-	}
-	else if (repoEvent === "referenceUpdated" && refType === "tag") {
+	} else if (repoEvent === "referenceUpdated" && refType === "tag") {
 		title = `Tag reference modified in repository ${repoName}`;
-	}
-	else if (repoEvent === "referenceDeleted" && refType === "tag") {
+	} else if (repoEvent === "referenceDeleted" && refType === "tag") {
 		title = `Deleted tag in repository ${repoName}`;
 	}
 
@@ -62,18 +57,19 @@ exports.parse = async (event) => {
 
 	const client = new AWS.CodeCommit({
 		region: event.getRegion(),
-		httpOptions: { timeout: 5, connectTimeout: 1 }
+		httpOptions: { timeout: 5, connectTimeout: 1 },
 	});
 	let commitId = _.get(event, "detail.commitId");
 	if (!commitId && refType === "branch" && repoEvent === "referenceUpdated") {
 		try {
-			const res = await client.getBranch({
-				repositoryName: repoName,
-				branchName: refName
-			}).promise();
+			const res = await client
+				.getBranch({
+					repositoryName: repoName,
+					branchName: refName,
+				})
+				.promise();
 			commitId = res.branch.commitId;
-		}
-		catch (err) {
+		} catch (err) {
 			console.error("repository.js: Failed to inspect branch:", err);
 			fields.push({
 				title: "Commit Message",
@@ -83,17 +79,21 @@ exports.parse = async (event) => {
 	}
 	if (commitId) {
 		try {
-			const res = await client.getCommit({
-				repositoryName: repoName,
-				commitId: commitId,
-			}).promise();
+			const res = await client
+				.getCommit({
+					repositoryName: repoName,
+					commitId: commitId,
+				})
+				.promise();
 			fields.push({
 				title: "Commit Message",
 				value: res.commit.message,
 			});
-		}
-		catch (err) {
-			console.error("repository.js: Failed to retrieve CodeCommit message:", err);
+		} catch (err) {
+			console.error(
+				"repository.js: Failed to retrieve CodeCommit message:",
+				err,
+			);
 			fields.push({
 				title: "Commit Message",
 				value: "Could not get message. Check logs for stack trace.",

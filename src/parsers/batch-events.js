@@ -1,15 +1,16 @@
 //
 // AWS Batch event parser
 //
-exports.matches = event =>
-	event.getSource() === "batch";
+exports.matches = (event) => event.getSource() === "batch";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const status = event.get("detail.status");
 	const reason = event.get("detail.statusReason");
 	const jobName = event.get("detail.jobName");
 	const logStream = event.get("detail.attempts[0].container.logStreamName");
-	const logsUrl = event.consoleUrl(`/cloudwatch/home#logEventViewer:group=/aws/batch/job;stream=${logStream};`);
+	const logsUrl = event.consoleUrl(
+		`/cloudwatch/home#logEventViewer:group=/aws/batch/job;stream=${logStream};`,
+	);
 	const fields = [];
 
 	let color = event.COLORS.neutral;
@@ -18,8 +19,7 @@ exports.parse = event => {
 	if (status === "SUCCESS") {
 		title = `${jobName} succeeded`;
 		color = event.COLORS.ok;
-	}
-	else if (status === "FAILED") {
+	} else if (status === "FAILED") {
 		title = `${jobName} failed`;
 		color = event.COLORS.critical;
 	}
@@ -27,13 +27,13 @@ exports.parse = event => {
 	fields.push({
 		title: "Status",
 		value: status,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "Reason",
 		value: `${reason}`,
-		short: true
+		short: true,
 	});
 
 	const logLink = event.getLink("View Logs", logsUrl);
@@ -41,7 +41,7 @@ exports.parse = event => {
 		fields.push({
 			title: "Logs",
 			value: logLink.toString(),
-			short: true
+			short: true,
 		});
 	}
 

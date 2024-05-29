@@ -1,11 +1,10 @@
 //
 // CloudWatch Metric Alarm
 //
-exports.matches = event =>
-	_.has(event.message, "AlarmName")
-	&& _.has(event.message, "AlarmDescription");
+exports.matches = (event) =>
+	_.has(event.message, "AlarmName") && _.has(event.message, "AlarmDescription");
 
-exports.parse = async event => {
+exports.parse = async (event) => {
 	const message = event.message;
 	const accountId = message.AWSAccountId;
 	const alarmName = message.AlarmName;
@@ -19,15 +18,15 @@ exports.parse = async event => {
 
 	let color = event.COLORS.neutral;
 	switch (newState) {
-	case "OK":
-		color = event.COLORS.ok;
-		break;
-	case "ALARM":
-		color = event.COLORS.critical;
-		break;
-	case "INSUFFICIENT_DATA":
-		color = event.COLORS.warning;
-		break;
+		case "OK":
+			color = event.COLORS.ok;
+			break;
+		case "ALARM":
+			color = event.COLORS.critical;
+			break;
+		case "INSUFFICIENT_DATA":
+			color = event.COLORS.warning;
+			break;
 	}
 
 	// Render chart
@@ -36,8 +35,7 @@ exports.parse = async event => {
 		const chart = await getChart(event);
 		logsUrl = chart.getCloudWatchURL(event.getTime(), region);
 		image_url = chart.getURL(message);
-	}
-	catch (err) {
+	} catch (err) {
 		console.log("Error rendering chart:", err);
 	}
 
@@ -54,17 +52,22 @@ exports.parse = async event => {
 		color: color,
 		author_name: `AWS CloudWatch Alarm (${accountId})`,
 		title: alarmName,
-		title_link: event.consoleUrl(`/cloudwatch/home?region=${region}#alarm:name=${alarmName}`),
+		title_link: event.consoleUrl(
+			`/cloudwatch/home?region=${region}#alarm:name=${alarmName}`,
+		),
 		text,
-		fields: [{
-			title: "State Change",
-			value: `${oldState} → ${newState}`,
-			short: true
-		}, {
-			title: "Region",
-			value: regionName,
-			short: true
-		}],
+		fields: [
+			{
+				title: "State Change",
+				value: `${oldState} → ${newState}`,
+				short: true,
+			},
+			{
+				title: "Region",
+				value: regionName,
+				short: true,
+			},
+		],
 		ts: new Date(time),
 		image_url,
 	});
@@ -88,7 +91,10 @@ async function getChart(event) {
 		query: {
 			Namespace: trigger.Namespace,
 			MetricName: trigger.MetricName,
-			Dimensions: _.map(trigger.Dimensions, d => ({ Name: d.name, Value: d.value })),
+			Dimensions: _.map(trigger.Dimensions, (d) => ({
+				Name: d.name,
+				Value: d.value,
+			})),
 			Statistics: [_.upperFirst(_.toLower(trigger.Statistic))],
 			Unit: trigger.Unit,
 		},
@@ -108,7 +114,7 @@ async function getChart(event) {
 	const chart = new Chart({
 		metrics: [metric],
 		timeOffset: 24 * 60 * 60, // Get statistic for last 24 hours
-		timePeriod: 60,    // Get statistic for each 60 seconds
+		timePeriod: 60, // Get statistic for each 60 seconds
 		chartSamples: 144, // Data points extrapolated on chart (1 per 10min)
 		width: 500,
 		height: 220,

@@ -23,7 +23,6 @@ require("./_parser_mock")
 	.named("cloudformation")
 	.matchesSnsMessage(matchingSnsMessage, subject);
 
-
 // LogicalResourceId !== StackName
 const ignoredSnsMessage = [
 	"StackId='arn:aws:cloudformation:REGION:ACCOUNT_ID:stack/STACK_NAME/1bff3bd0-8f10-11e7-8d95-500c28604ce6'",

@@ -1,10 +1,10 @@
 //
 // RDS Message
 //
-exports.matches = event =>
+exports.matches = (event) =>
 	_.get(event.message, "Event Source") === "db-instance";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const text = event.get("Event Message");
 	const instanceId = event.get("Source ID");
 	const link = event.get("Identifier Link");
@@ -17,6 +17,6 @@ exports.parse = event => {
 		title: instanceId,
 		title_link: link,
 		text: text,
-		ts: new Date(time)
+		ts: new Date(time),
 	});
 };

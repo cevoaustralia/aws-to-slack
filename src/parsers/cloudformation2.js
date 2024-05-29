@@ -1,10 +1,9 @@
 //
 // AWS CloudFormation event parser
 //
-exports.matches = event =>
-	event.getSource() === "cloudformation";
+exports.matches = (event) => event.getSource() === "cloudformation";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
 	const message = event.message;
@@ -36,36 +35,37 @@ exports.parse = event => {
 	fields.push({
 		title: "Event Name",
 		value: `${eventName} (${awsRegion})`,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "Source",
 		value: userAgent,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "Invoked by",
 		value: `${userPrincipal} - ${userName}`,
-		short: false
+		short: false,
 	});
 
 	if (requestParameters) {
 		for (var name in requestParameters) {
 			const value = requestParameters[name];
 
-			if (name === "parameters" ||
+			if (
+				name === "parameters" ||
 				name === "capabilities" ||
 				name === "usePreviousTemplate" ||
-				name === "notificationARNs") {
+				name === "notificationARNs"
+			) {
 				continue;
-			}
-			else {
+			} else {
 				fields.push({
 					title: name,
 					value: value,
-					short: true
+					short: true,
 				});
 			}
 		}
@@ -75,7 +75,7 @@ exports.parse = event => {
 		fields.push({
 			title: errorCode,
 			value: errorMessage,
-			short: false
+			short: false,
 		});
 	}
 
@@ -94,79 +94,79 @@ exports.parse = event => {
 		fallback: `${stackName}: ${title}`,
 		// color: color,
 		ts: new Date(time),
-		fields: fields
+		fields: fields,
 	});
 };
 
 const COLORS = require("../eventdef").COLORS;
 // Status codes from <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-describing-stacks.html#w2ab1c15c15c17c11>
 const statusMappings = {
-	"CREATE_COMPLETE": {
-		"title": "Stack creation complete",
-		"color": COLORS.ok,
+	CREATE_COMPLETE: {
+		title: "Stack creation complete",
+		color: COLORS.ok,
 	},
-	"CREATE_IN_PROGRESS": {
-		"title": "Stack creation in progress",
-		"color": COLORS.accent,
+	CREATE_IN_PROGRESS: {
+		title: "Stack creation in progress",
+		color: COLORS.accent,
 	},
-	"CREATE_FAILED": {
-		"title": "Stack creation failed",
-		"color": COLORS.critical,
+	CREATE_FAILED: {
+		title: "Stack creation failed",
+		color: COLORS.critical,
 	},
-	"DELETE_COMPLETE": {
-		"title": "Stack deletion complete",
-		"color": COLORS.ok,
+	DELETE_COMPLETE: {
+		title: "Stack deletion complete",
+		color: COLORS.ok,
 	},
-	"DELETE_FAILED": {
-		"title": "Stack deletion failed",
-		"color": COLORS.critical,
+	DELETE_FAILED: {
+		title: "Stack deletion failed",
+		color: COLORS.critical,
 	},
-	"DELETE_IN_PROGRESS": {
-		"title": "Stack deletion in progress",
-		"color": COLORS.accent,
+	DELETE_IN_PROGRESS: {
+		title: "Stack deletion in progress",
+		color: COLORS.accent,
 	},
-	"REVIEW_IN_PROGRESS": {
-		"title": "Stack review in progress",
-		"color": COLORS.accent,
+	REVIEW_IN_PROGRESS: {
+		title: "Stack review in progress",
+		color: COLORS.accent,
 	},
-	"ROLLBACK_COMPLETE": {
-		"title": "Stack rollback complete",
-		"color": COLORS.warning,
+	ROLLBACK_COMPLETE: {
+		title: "Stack rollback complete",
+		color: COLORS.warning,
 	},
-	"ROLLBACK_FAILED": {
-		"title": "Stack rollback failed",
-		"color": COLORS.critical,
+	ROLLBACK_FAILED: {
+		title: "Stack rollback failed",
+		color: COLORS.critical,
 	},
-	"ROLLBACK_IN_PROGRESS": {
-		"title": "Stack rollback in progress",
-		"color": COLORS.warning,
+	ROLLBACK_IN_PROGRESS: {
+		title: "Stack rollback in progress",
+		color: COLORS.warning,
 	},
-	"UPDATE_COMPLETE": {
-		"title": "Stack update complete",
-		"color": COLORS.ok,
+	UPDATE_COMPLETE: {
+		title: "Stack update complete",
+		color: COLORS.ok,
 	},
-	"UPDATE_COMPLETE_CLEANUP_IN_PROGRESS": {
-		"title": "Stack update complete, cleanup in progress",
-		"color": COLORS.accent,
+	UPDATE_COMPLETE_CLEANUP_IN_PROGRESS: {
+		title: "Stack update complete, cleanup in progress",
+		color: COLORS.accent,
 	},
-	"UPDATE_IN_PROGRESS": {
-		"title": "Stack update in progress",
-		"color": COLORS.accent,
+	UPDATE_IN_PROGRESS: {
+		title: "Stack update in progress",
+		color: COLORS.accent,
 	},
-	"UPDATE_ROLLBACK_COMPLETE": {
-		"title": "Stack update rollback complete",
-		"color": COLORS.warning,
+	UPDATE_ROLLBACK_COMPLETE: {
+		title: "Stack update rollback complete",
+		color: COLORS.warning,
 	},
-	"UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS": {
-		"title": "Stack update rollback complete, cleanup in progress",
-		"color": COLORS.warning,
+	UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS: {
+		title: "Stack update rollback complete, cleanup in progress",
+		color: COLORS.warning,
 	},
-	"UPDATE_ROLLBACK_FAILED": {
-		"title": "Stack update rollback failed",
-		"color": COLORS.critical,
+	UPDATE_ROLLBACK_FAILED: {
+		title: "Stack update rollback failed",
+		color: COLORS.critical,
 	},
-	"UPDATE_ROLLBACK_IN_PROGRESS": {
-		"title": "Stack update rollback in progress",
-		"color": COLORS.warning,
+	UPDATE_ROLLBACK_IN_PROGRESS: {
+		title: "Stack update rollback in progress",
+		color: COLORS.warning,
 	},
 };

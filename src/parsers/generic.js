@@ -5,7 +5,7 @@
 //
 exports.matches = () => true; // Match every event
 
-exports.parse = event => {
+exports.parse = (event) => {
 	console.log(`Event ${JSON.stringify(event, null, 2)}`);
 
 	// Clone object so we can delete known keys
@@ -14,7 +14,8 @@ exports.parse = event => {
 
 	let title = event.getSubject() || "Raw Event",
 		author_name = event.getSource() || "<unknown>",
-		fields, text;
+		fields,
+		text;
 
 	if (_.isObject(msg)) {
 		if (msg.source) {
@@ -44,13 +45,13 @@ exports.parse = event => {
 
 		// Serialize the whole event data
 		fields = objectToFields(msg);
-		text = fields ? ""
-		// eslint-disable-next-line lodash/prefer-lodash-method
-			: JSON.stringify(msg, null, 2)
-				.replace(/^{\n/, "")
-				.replace(/\n}\n?$/, "");
-	}
-	else if (_.isString(msg)) {
+		text = fields
+			? ""
+			: // eslint-disable-next-line lodash/prefer-lodash-method
+				JSON.stringify(msg, null, 2)
+					.replace(/^{\n/, "")
+					.replace(/\n}\n?$/, "");
+	} else if (_.isString(msg)) {
 		text = msg;
 	}
 
@@ -79,8 +80,7 @@ function objectToFields(obj) {
 				// pull first string from array
 				if (_.isArray(val) && val.length === 1 && _.isString(val[0])) {
 					val = val[0];
-				}
-				else {
+				} else {
 					val = JSON.stringify(val);
 				}
 			}

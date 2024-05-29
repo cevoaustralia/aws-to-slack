@@ -1,10 +1,9 @@
 //
 // AWS Auto-Scaling event parser
 //
-exports.matches = event =>
-	_.has(event.message, "AutoScalingGroupARN");
+exports.matches = (event) => _.has(event.message, "AutoScalingGroupARN");
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const accountId = event.get("AccountId");
 	//const requestId = event.get("RequestId");
 	const arn = event.get("AutoScalingGroupARN");
@@ -20,7 +19,9 @@ exports.parse = event => {
 	}
 
 	const signInLink = `https://${accountId}.signin.aws.amazon.com/console/ec2?region=${region}`;
-	const consoleLink = event.consoleUrl(`/ec2/autoscaling/home#AutoScalingGroups:id=${groupName}`);
+	const consoleLink = event.consoleUrl(
+		`/ec2/autoscaling/home#AutoScalingGroups:id=${groupName}`,
+	);
 
 	const text = `Auto Scaling triggered ${eventName} for service ${service}.`;
 
@@ -32,14 +33,17 @@ exports.parse = event => {
 		text,
 		fallback: text,
 		color: event.COLORS.neutral,
-		fields: [{
-			title: "Service",
-			value: service,
-			short: true,
-		}, {
-			title: "Event",
-			value: eventName,
-			short: true,
-		}]
+		fields: [
+			{
+				title: "Service",
+				value: service,
+				short: true,
+			},
+			{
+				title: "Event",
+				value: eventName,
+				short: true,
+			},
+		],
 	});
 };

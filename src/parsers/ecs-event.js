@@ -1,16 +1,17 @@
 //
 // AWS ECS Event
 //
-exports.matches = event =>
-	event.getSource() === "ecs";
+exports.matches = (event) => event.getSource() === "ecs";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const time = new Date(event.get("time"));
 	const detailType = event.get("detail-type");
 	const status = event.get("detail.lastStatus");
 	const desiredStatus = event.get("detail.desiredStatus");
 	const region = event.parseArn(event.get("detail.clusterArn")).region;
-	const cluster = event.parseArn(event.get("detail.clusterArn")).resource.slice(8);
+	const cluster = event
+		.parseArn(event.get("detail.clusterArn"))
+		.resource.slice(8);
 	const clusterUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services`;
 	const fields = [];
 
@@ -18,7 +19,6 @@ exports.parse = event => {
 	var color = event.COLORS.neutral;
 
 	if (detailType === "ECS Task State Change") {
-
 		// {
 		// 	"version": "0",
 		// 	"id": "0efbccea-222d-61fc-c9f3-############",
@@ -84,7 +84,7 @@ exports.parse = event => {
 		const serviceUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/details`;
 
 		const getTask = event.parseArn(event.get("detail.taskArn")).resource;
-		const task = getTask.slice(5).replace(cluster+'/', '');
+		const task = getTask.slice(5).replace(cluster + "/", "");
 		const taskUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/tasks/${task}/details`;
 		const logsUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/logs`;
 
@@ -96,8 +96,7 @@ exports.parse = event => {
 
 		if (status === "RUNNING" && desiredStatus === "RUNNING") {
 			color = event.COLORS.ok;
-		}
-		else if (desiredStatus === "STOPPED") {
+		} else if (desiredStatus === "STOPPED") {
 			stoppedReason = event.get("detail.stoppedReason");
 			color = event.COLORS.critical;
 		}
@@ -105,48 +104,45 @@ exports.parse = event => {
 		fields.push({
 			title: "Task",
 			value: `<${taskUrl}|${task}>`,
-			short: false
+			short: false,
 		});
 
 		fields.push({
 			title: "Status",
 			value: `${status}`,
-			short: true
+			short: true,
 		});
 
 		fields.push({
 			title: "Desired Status",
 			value: `${desiredStatus}`,
-			short: true
+			short: true,
 		});
 
 		fields.push({
 			title: "Reason",
 			value: `${stoppedReason}`,
-			short: true
+			short: true,
 		});
 
 		fields.push({
 			title: "Service Logs",
 			value: `<${logsUrl}|View Logs>`,
-			short: true
+			short: true,
 		});
 
 		fields.push({
 			title: "Service",
 			value: `<${serviceUrl}|${service}>`,
-			short: false
+			short: false,
 		});
 
 		fields.push({
 			title: "Cluster",
 			value: `<${clusterUrl}|${cluster}>`,
-			short: false
+			short: false,
 		});
-	
-	}
-	else if (detailType === "ECS Service Action") {
-
+	} else if (detailType === "ECS Service Action") {
 		// {
 		// 	"version": "0",
 		// 	"id": "fce16a07-6467-199e-d07e-############",
@@ -161,7 +157,7 @@ exports.parse = event => {
 		// 	"detail": {
 		// 		"eventType": "INFO",
 		// 		"eventName": "SERVICE_STEADY_STATE",
-		// 		"clusterArn": "arn:aws:ecs:eu-west-1:##############:cluster/proxy-ecs-cluster-dev",  
+		// 		"clusterArn": "arn:aws:ecs:eu-west-1:##############:cluster/proxy-ecs-cluster-dev",
 		// 		"createdAt": "2020-04-14T13:17:15.733Z"
 		// 	}
 		// }
@@ -169,7 +165,7 @@ exports.parse = event => {
 		const eventType = event.get("detail.eventType");
 		const eventName = event.get("detail.eventName");
 		const getService = event.parseArn(event.get("resources")).resource;
-		const service = getService.slice(8).replace(cluster+'/', '');
+		const service = getService.slice(8).replace(cluster + "/", "");
 		const serviceUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/details`;
 		const logsUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/logs`;
 
@@ -177,38 +173,35 @@ exports.parse = event => {
 
 		if (eventType === "INFO") {
 			color = event.COLORS.ok;
-		}
-		else if (status === "WARN") {
+		} else if (status === "WARN") {
 			color = event.COLORS.warning;
-		}
-		else if (status === "ERROR") {
+		} else if (status === "ERROR") {
 			color = event.COLORS.critical;
 		}
 
 		fields.push({
 			title: "Service",
 			value: `<${serviceUrl}|${service}>`,
-			short: false
+			short: false,
 		});
 
 		fields.push({
 			title: "Status",
 			value: `${eventName}`,
-			short: true
+			short: true,
 		});
 
 		fields.push({
 			title: "Service Logs",
 			value: `<${logsUrl}|View Logs>`,
-			short: true
+			short: true,
 		});
 
 		fields.push({
 			title: "Cluster",
 			value: `<${clusterUrl}|${cluster}>`,
-			short: false
-		});	
-
+			short: false,
+		});
 	}
 
 	return event.attachmentWithDefaults({
@@ -217,6 +210,6 @@ exports.parse = event => {
 		color: color,
 		title: title,
 		fields: fields,
-		mrkdwn_in: ["title", "text"]
+		mrkdwn_in: ["title", "text"],
 	});
 };

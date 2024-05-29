@@ -9,7 +9,6 @@ global._ = _;
  * Event abstraction to help with Lambda and SNS un-wrapping.
  */
 class EventDef {
-
 	constructor(event) {
 		this.COLORS = EventDef.COLORS;
 		this.rawEvent = event;
@@ -20,12 +19,18 @@ class EventDef {
 
 		// The "message" is the unwrapped data from SNS or the "record" if not from SNS
 		let message = _.get(this.record, "Sns.Message") || this.record;
-		if (_.isString(message) && _.startsWith(message, "{") && _.endsWith(message, "}")) {
+		if (
+			_.isString(message) &&
+			_.startsWith(message, "{") &&
+			_.endsWith(message, "}")
+		) {
 			try {
 				message = JSON.parse(message);
-			}
-			catch (err) {
-				console.log(`Message looked like JSON, but failed parse: ${err.message}`, this.record);
+			} catch (err) {
+				console.log(
+					`Message looked like JSON, but failed parse: ${err.message}`,
+					this.record,
+				);
 			}
 		}
 		this.message = message;
@@ -65,9 +70,10 @@ class EventDef {
 	 * @internal
 	 */
 	getArn() {
-		const arn = _.get(this.message, "resources[0]")
-			|| _.get(this.message, "arn")
-			|| _.get(this.record, "EventSubscriptionArn");
+		const arn =
+			_.get(this.message, "resources[0]") ||
+			_.get(this.message, "arn") ||
+			_.get(this.record, "EventSubscriptionArn");
 		return this.parseArn(arn);
 	}
 
@@ -80,9 +86,7 @@ class EventDef {
 	getSource() {
 		const src = _.get(this.message, "source");
 		if (src) {
-			return _.startsWith(src, "aws.")
-				? src.substr(4)
-				: src;
+			return _.startsWith(src, "aws.") ? src.substr(4) : src;
 		}
 		return this.getArn().product;
 	}
@@ -103,16 +107,17 @@ class EventDef {
 	 * @returns {Date|undefined} Date/time of event.
 	 */
 	getTime() {
-		const val = _.get(this.message, "time")
-			|| _.get(this.message, "Time")
-			|| _.get(this.message, "Timestamp")
-			|| _.get(this.record, "Sns.Timestamp");
+		const val =
+			_.get(this.message, "time") ||
+			_.get(this.message, "Time") ||
+			_.get(this.message, "Timestamp") ||
+			_.get(this.record, "Sns.Timestamp");
 		if (!val) {
 			return undefined;
 		}
 		const d = new Date(val);
 		if (!d.getTime()) {
-			return undefined;// don't return bad date
+			return undefined; // don't return bad date
 		}
 		return d;
 	}
@@ -163,12 +168,10 @@ class EventDef {
 		let url = String(path);
 		if (_.startsWith(url, "//")) {
 			url = "https:" + url;
-		}
-		else if (_.startsWith(url, "/")) {
+		} else if (_.startsWith(url, "/")) {
 			if (_.startsWith(region, "cn-")) {
 				url = "https://console.amazonaws.cn" + url;
-			}
-			else {
+			} else {
 				url = "https://console.aws.amazon.com" + url;
 			}
 		}
@@ -189,10 +192,9 @@ class EventDef {
 				if (!hasRegion) {
 					// add region and re-generate link
 					qsObj.region = region;
-					url = `${u.protocol}//${u.host}${u.pathname||""}?${qs.stringify(qsObj)}${u.hash||""}`;
+					url = `${u.protocol}//${u.host}${u.pathname || ""}?${qs.stringify(qsObj)}${u.hash || ""}`;
 				}
-			}
-			else {
+			} else {
 				console.error(`event.consoleUrl(): given unparsable path: ${path}`);
 			}
 		}
@@ -211,7 +213,7 @@ class EventDef {
 			attachment.ts = this.getTime() || new Date();
 		}
 		if (_.isDate(attachment.ts)) {
-			attachment.ts = attachment.ts.getTime() / 1000 | 0;
+			attachment.ts = (attachment.ts.getTime() / 1000) | 0;
 		}
 
 		if (!attachment.footer) {
@@ -222,12 +224,13 @@ class EventDef {
 				const arn = this.parseArn(snsArn);
 				// separate topic from subscription
 				const topic = _.split(arn.suffix, ":")[0];
-				const url = this.consoleUrl(`/sns/v2/home?region=${arn.region}#/topics/arn:aws:sns:${arn.region}:${arn.account}:${topic}`);
+				const url = this.consoleUrl(
+					`/sns/v2/home?region=${arn.region}#/topics/arn:aws:sns:${arn.region}:${arn.account}:${topic}`,
+				);
 				const signin = `https://${arn.account}.signin.aws.amazon.com/console/sns?region=${arn.region}`;
 				// limit visible length of topic
-				const topicVisible = topic.length > 40
-					? topic.substr(0, 35) + "..."
-					: topic;
+				const topicVisible =
+					topic.length > 40 ? topic.substr(0, 35) + "..." : topic;
 
 				const snsLink = this.getLink(`SNS ${topicVisible}`, url);
 				const signinLink = this.getLink("Sign-In", signin);
@@ -242,7 +245,7 @@ class EventDef {
 		}
 
 		return {
-			attachments: [ attachment ],
+			attachments: [attachment],
 		};
 	}
 }

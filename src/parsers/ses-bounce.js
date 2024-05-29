@@ -1,10 +1,10 @@
 //
 // SES "Received" notifications incoming via SNS
 //
-exports.matches = event =>
+exports.matches = (event) =>
 	_.get(event.message, "notificationType") === "Bounce";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const bounceType = event.get("bounce.bounceType");
 	const bounceSubType = event.get("bounce.bounceSubType");
 	const bouncedRecipients = event.get("bounce.bouncedRecipients");
@@ -19,35 +19,34 @@ exports.parse = event => {
 		fields.push({
 			title: "From",
 			value: source,
-			short: true
+			short: true,
 		});
 	}
 	if (destination) {
 		fields.push({
 			title: "To",
 			value: _.join(destination, ",\n"),
-			short: true
+			short: true,
 		});
 	}
 
-	let color = event.COLORS.neutral
+	let color = event.COLORS.neutral;
 	if (bounceType === "Transient") {
 		color = event.COLORS.accent;
-	}
-	else if (bounceType === "Permanent") {
+	} else if (bounceType === "Permanent") {
 		color = event.COLORS.critical;
 	}
 
 	fields.push({
 		title: "BounceType",
 		value: bounceType,
-		short: true
+		short: true,
 	});
-	
+
 	fields.push({
 		title: "BounceSubType",
 		value: bounceSubType,
-		short: true
+		short: true,
 	});
 
 	return event.attachmentWithDefaults({
@@ -57,6 +56,6 @@ exports.parse = event => {
 		title: subject,
 		text: JSON.stringify(bouncedRecipients),
 		fields: fields,
-		ts: new Date(timestamp)
+		ts: new Date(timestamp),
 	});
 };

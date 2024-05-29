@@ -1,11 +1,11 @@
 //
 // AWS CodePipeline event parser
 //
-exports.matches = event =>
-	event.getSource() === "codepipeline"
-	&& !_.has(event.message, "approval.pipelineName");
+exports.matches = (event) =>
+	event.getSource() === "codepipeline" &&
+	!_.has(event.message, "approval.pipelineName");
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const pipeline = event.get("detail.pipeline", "<missing-pipeline>");
 	const state = event.get("detail.state");
 	const type = event.get("detail-type");
@@ -30,34 +30,37 @@ exports.parse = event => {
 		const typeCategory = event.get("detail.type.category");
 		title = `${pipeline} [Action: ${stage}/${action}] >> ${state}`;
 		text = `ExecID ${execId} is now ${state} at Action ${stage}/${action} (type: ${typeProvider} / ${typeCategory})`;
-	}
-	else if (r === "Stage") {
+	} else if (r === "Stage") {
 		title = `${pipeline} [Stage: ${stage}] >> ${state}`;
 		text = `ExecID ${execId} is now ${state} at Stage ${stage}`;
-	}
-	else {
+	} else {
 		title = `${pipeline} >> ${state}`;
 	}
 
-	const color = (COLORS => {
+	const color = ((COLORS) => {
 		switch (state) {
-		//case "RESUMED":
-		//case "SUPERSEDED":
-		case "STARTED":
-			return COLORS.accent;
-		case "SUCCEEDED":
-			return COLORS.ok;
-		case "FAILED":
-			return COLORS.critical;
-		case "CANCELLED":
-			return COLORS.warning;
-		default:
-			return COLORS.neutral;
+			//case "RESUMED":
+			//case "SUPERSEDED":
+			case "STARTED":
+				return COLORS.accent;
+			case "SUCCEEDED":
+				return COLORS.ok;
+			case "FAILED":
+				return COLORS.critical;
+			case "CANCELLED":
+				return COLORS.warning;
+			default:
+				return COLORS.neutral;
 		}
 	})(event.COLORS);
 
 	return event.attachmentWithDefaults({
 		fallback: `${pipeline} >> ${state}`,
-		author_name, color, title, title_link, text, fields,
+		author_name,
+		color,
+		title,
+		title_link,
+		text,
+		fields,
 	});
 };

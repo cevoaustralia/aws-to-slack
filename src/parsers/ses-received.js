@@ -1,10 +1,10 @@
 //
 // SES "Received" notifications incoming via SNS
 //
-exports.matches = event =>
+exports.matches = (event) =>
 	_.get(event.message, "notificationType") === "Received";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const source = event.get("mail.source");
 	const destination = event.get("mail.destination");
 	const timestamp = event.get("mail.timestamp");
@@ -16,14 +16,14 @@ exports.parse = event => {
 		fields.push({
 			title: "From",
 			value: source,
-			short: true
+			short: true,
 		});
 	}
 	if (destination) {
 		fields.push({
 			title: "To",
 			value: _.join(destination, ",\n"),
-			short: true
+			short: true,
 		});
 	}
 

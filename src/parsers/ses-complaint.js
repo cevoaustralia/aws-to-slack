@@ -2,10 +2,10 @@
 // SES "Received" notifications incoming via SNS
 // https://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html
 //
-exports.matches = event =>
+exports.matches = (event) =>
 	_.get(event.message, "notificationType") === "Complaint";
 
-exports.parse = event => {
+exports.parse = (event) => {
 	const userAgent = event.get("complaint.userAgent");
 	const complainedRecipients = event.get("complaint.complainedRecipients");
 	const complaintFeedbackType = event.get("complain.complaintFeedbackType");
@@ -19,29 +19,29 @@ exports.parse = event => {
 		fields.push({
 			title: "From",
 			value: source,
-			short: true
+			short: true,
 		});
 	}
 	if (destination) {
 		fields.push({
 			title: "To",
 			value: _.join(destination, ",\n"),
-			short: true
+			short: true,
 		});
 	}
 
-	let color = event.COLORS.critical
-	
+	let color = event.COLORS.critical;
+
 	fields.push({
 		title: "UserAgent",
 		value: `${userAgent}`,
-		short: true
+		short: true,
 	});
 
 	fields.push({
 		title: "Complain Type",
 		value: `${complaintFeedbackType}`,
-		short: true
+		short: true,
 	});
 
 	return event.attachmentWithDefaults({
@@ -51,6 +51,6 @@ exports.parse = event => {
 		title: subject,
 		text: JSON.stringify(complainedRecipients),
 		fields: fields,
-		ts: new Date(timestamp)
+		ts: new Date(timestamp),
 	});
 };
