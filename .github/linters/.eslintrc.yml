@@ -27,8 +27,8 @@ parserOptions:
     presets:
       - jest
 
-plugins:
-  - jest
+#plugins:
+#  - jest
 
 extends:
   - eslint:recommended
