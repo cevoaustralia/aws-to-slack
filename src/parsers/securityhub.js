@@ -113,9 +113,9 @@ exports.parse = (event) => {
 	return event.attachmentWithDefaults({
 		author_name: "Amazon SecurityHub",
 		fallback: `${title} ${description}`,
-		color: color,
-		title: title,
-		fields: fields,
+		color,
+		title,
+		fields,
 		mrkdwn_in: ["title", "text"],
 		ts: createdAt,
 	});

@@ -1,8 +1,8 @@
 const handleEvent = require("../src/index");
 
 function handleStdIn() {
-	const stdin = process.stdin,
-		inputChunks = [];
+	const stdin = process.stdin;
+	const inputChunks = [];
 
 	stdin.on("data", inputChunks.push.bind(inputChunks));
 

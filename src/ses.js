@@ -1,5 +1,5 @@
-const AWS = require("aws-sdk"),
-	_ = require("lodash");
+const AWS = require("aws-sdk");
+const _ = require("lodash");
 
 const FromAddress = process.env.FROM_ADDRESS;
 const ToAddresses = _.compact(
@@ -86,9 +86,9 @@ function subjectFromSlack(slackMessage) {
  * @returns {{Html: {Charset: string, Data: string}, Text: {Charset: string, Data: string}}} SES-compatible body object
  */
 function render(slackMessage, event) {
-	const att = slackMessage.attachments[0],
-		html = [],
-		text = [];
+	const att = slackMessage.attachments[0];
+	const html = [];
+	const text = [];
 
 	const color_map = {
 		danger: "#FF324D",

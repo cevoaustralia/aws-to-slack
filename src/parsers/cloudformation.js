@@ -53,10 +53,10 @@ exports.parse = (event) => {
 
 	return event.attachmentWithDefaults({
 		author_name: "AWS CloudFormation",
-		title: title,
+		title,
 		title_link: consoleLink,
 		fallback: `${stackName}: ${title}`,
-		color: color,
+		color,
 		ts: new Date(time),
 		fields: [
 			{

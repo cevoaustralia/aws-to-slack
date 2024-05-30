@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const example = {
 	account: "123456789012",
 	region: "us-east-1",

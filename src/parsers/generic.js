@@ -12,10 +12,10 @@ exports.parse = (event) => {
 	const msg = _.clone(event.message);
 	const fallback = JSON.stringify(event.record, null, 2);
 
-	let title = event.getSubject() || "Raw Event",
-		author_name = event.getSource() || "<unknown>",
-		fields,
-		text;
+	let title = event.getSubject() || "Raw Event";
+	let author_name = event.getSource() || "<unknown>";
+	let fields;
+	let text;
 
 	if (_.isObject(msg)) {
 		if (msg.source) {

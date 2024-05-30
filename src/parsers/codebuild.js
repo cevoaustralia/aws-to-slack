@@ -8,12 +8,12 @@ exports.parse = (event) => {
 	const project = event.get("detail.project-name");
 	const buildId = _.split(event.get("detail.build-id"), ":").pop();
 	const buildUrl = event.consoleUrl(
-		`/codesuite/codebuild/projects/${project}/build/${encodeURIComponent(project + ":" + buildId)}/`,
+		`/codesuite/codebuild/projects/${project}/build/${encodeURIComponent(`${project}:${buildId}`)}/`,
 	);
 
-	const author_name =
-		"AWS CodeBuild" +
-		(event.getAccountId() ? ` (${event.getAccountId()})` : "");
+	const author_name = `AWS CodeBuild${
+		event.getAccountId() ? ` (${event.getAccountId()})` : ""
+	}`;
 	const title = project;
 	const title_link = buildUrl;
 	const fields = [];

@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const exampleSnsMessage = {
 	AccountId: "849571656326",
 	RequestId: "bad2bfb5-0a61-11e9-aed0-a14d1975b70c",

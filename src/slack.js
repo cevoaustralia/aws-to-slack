@@ -1,7 +1,7 @@
-const url = require("url"),
-	https = require("https"),
-	AWS = require("aws-sdk"),
-	_ = require("lodash");
+const url = require("url");
+const https = require("https");
+const AWS = require("aws-sdk");
+const _ = require("lodash");
 
 /** The Slack hook URL */
 const hookUrlPromise = shouldDecryptBlob(
@@ -92,7 +92,7 @@ class Slack {
 				throw e;
 			}
 
-			throw `Slack API error [HTTP:${response.statusCode}]: ${response.body}`;
+			throw new Error(`Slack API error [HTTP:${response.statusCode}]: ${response.body}`);
 		});
 	}
 }

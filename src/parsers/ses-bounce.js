@@ -51,11 +51,11 @@ exports.parse = (event) => {
 
 	return event.attachmentWithDefaults({
 		fallback: `Bounce: ${bounceType} - ${bounceSubType}`,
-		color: color,
+		color,
 		author_name: `Amazon SES - Bounce: ${bounceType} - ${bounceSubType}`,
 		title: subject,
 		text: JSON.stringify(bouncedRecipients),
-		fields: fields,
+		fields,
 		ts: new Date(timestamp),
 	});
 };

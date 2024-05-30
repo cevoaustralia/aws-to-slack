@@ -1,8 +1,12 @@
-/* global expect, test, jest */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable filenames/match-regex */
+/* eslint-disable jest/no-export */
+/* eslint-disable jest/no-conditional-expect */
+
 /* eslint lodash/prefer-lodash-typecheck:0 lodash/prefer-lodash-method:0 */
 
-const Handler = require("../../src/index"),
-	EventDef = require("../../src/eventdef");
+const Handler = require("../../src/index");
+const EventDef = require("../../src/eventdef");
 
 /**
  * Helper class for creating tests around event parsing.

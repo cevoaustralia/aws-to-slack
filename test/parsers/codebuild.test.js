@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const example = {
 	version: "0",
 	id: "c030038d-8c4d-6141-9545-00ff7b7153EX",

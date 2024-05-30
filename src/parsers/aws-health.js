@@ -65,10 +65,10 @@ exports.parse = (event) => {
 
 	return event.attachmentWithDefaults({
 		fallback: text,
-		color: color,
+		color,
 		title: detailType,
 		text: formatMrkdwn(text),
-		fields: fields,
+		fields,
 		ts: new Date(startTime || time),
 		mrkdwn_in: ["text"],
 	});

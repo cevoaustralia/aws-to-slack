@@ -27,17 +27,20 @@ parserOptions:
     presets:
       - jest
 
-#plugins:
-#  - jest
+plugins:
+  - jest
+  - prettier
 
 extends:
   - eslint:recommended
-  #  - plugin:github/recommended
+  - plugin:github/recommended
   - plugin:jest/recommended
 
 rules:
   {
     "camelcase": "off",
+    "brace-style": "off",
+    "indent": "off",
     "eslint-comments/no-use": "off",
     "eslint-comments/no-unused-disable": "off",
     "i18n-text/no-en": "off",

@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 // The generic parser is intended to match anything that DOES NOT match another parser.
 // Update these examples below if they happen to match your custom parser format.
 
@@ -8,10 +6,11 @@ const simpleSnsPacket = {
 		{
 			EventSource: "aws:sns",
 			EventVersion: "1.0",
-			EventSubscriptionArn: `arn:aws:sns:region:account-id:topicname:subscriptionid`,
+			EventSubscriptionArn:
+				"arn:aws:sns:region:account-id:topicname:subscriptionid",
 			Sns: {
 				Type: "Notification",
-				TopicArn: `arn:aws:sns:region:account-id:topicname`,
+				TopicArn: "arn:aws:sns:region:account-id:topicname",
 				Subject: "TestInvoke",
 				MessageId: "sample-message",
 				Message:
@@ -28,6 +27,7 @@ const simpleSnsPacket = {
 };
 
 const mock = require("./_parser_mock").named("guardduty");
+
 mock.matchesEvent(simpleSnsPacket);
 
 mock.matchesEventWithDetail(simpleSnsPacket, {

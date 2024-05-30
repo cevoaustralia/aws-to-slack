@@ -70,10 +70,10 @@ exports.parse = (event) => {
 	return event.attachmentWithDefaults({
 		author_name: "AWS CodeCommit",
 		fallback: `${repoName}: ${title}`,
-		color: color,
-		title: title,
+		color,
+		title,
 		title_link: pullRequestUrl,
-		fields: fields,
+		fields,
 		mrkdwn_in: ["title", "text"],
 	});
 };

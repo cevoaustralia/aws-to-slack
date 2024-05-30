@@ -15,8 +15,8 @@ exports.parse = (event) => {
 	const clusterUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services`;
 	const fields = [];
 
-	var title = `${cluster} - ${detailType} - ${status}`;
-	var color = event.COLORS.neutral;
+	let title = `${cluster} - ${detailType} - ${status}`;
+	let color = event.COLORS.neutral;
 
 	if (detailType === "ECS Task State Change") {
 		// {
@@ -84,11 +84,11 @@ exports.parse = (event) => {
 		const serviceUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/details`;
 
 		const getTask = event.parseArn(event.get("detail.taskArn")).resource;
-		const task = getTask.slice(5).replace(cluster + "/", "");
+		const task = _.replace(getTask.slice(5), `${cluster}/`, "");
 		const taskUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/tasks/${task}/details`;
 		const logsUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/logs`;
 
-		var stoppedReason = "Unknown";
+		let stoppedReason = "Unknown";
 		title = null;
 
 		// default is warning
@@ -165,7 +165,7 @@ exports.parse = (event) => {
 		const eventType = event.get("detail.eventType");
 		const eventName = event.get("detail.eventName");
 		const getService = event.parseArn(event.get("resources")).resource;
-		const service = getService.slice(8).replace(cluster + "/", "");
+		const service = _.replace(getService.slice(8), `${cluster}/`, "");
 		const serviceUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/details`;
 		const logsUrl = `https://console.aws.amazon.com/ecs/home?region=${region}#/clusters/${cluster}/services/${service}/logs`;
 
@@ -207,9 +207,9 @@ exports.parse = (event) => {
 	return event.attachmentWithDefaults({
 		author_name: `Amazon ECS - ${detailType}`,
 		fallback: `${title}`,
-		color: color,
-		title: title,
-		fields: fields,
+		color,
+		title,
+		fields,
 		mrkdwn_in: ["title", "text"],
 	});
 };

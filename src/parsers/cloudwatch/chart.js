@@ -61,8 +61,8 @@
 	```
 */
 
-const AWS = require("aws-sdk"),
-	_ = require("lodash");
+const AWS = require("aws-sdk");
+const _ = require("lodash");
 
 // @see https://developers.google.com/chart/image/docs/data_formats
 const extendedEncode = (() => {
@@ -297,7 +297,7 @@ class AwsCloudWatchChart {
 		let fromTime = Date.now();
 		const validDatapoints = _.filter(this.metrics, (m) => m.datapoints.length);
 		if (!validDatapoints.length) {
-			throw "No datapoints returned from CloudWatch, cannot render empty chart";
+			throw new Error("No datapoints returned from CloudWatch, cannot render empty chart");
 		}
 
 		_.each(validDatapoints, (m) => {
@@ -310,7 +310,7 @@ class AwsCloudWatchChart {
 		});
 		if (fromTime < 99 || toTime < 99) {
 			// should be very large numbers
-			throw "Cannot render a chart without timeframe";
+			throw new Error("Cannot render a chart without timeframe");
 		}
 
 		let chartSamples = this.chartSamples;
@@ -400,15 +400,13 @@ class AwsCloudWatchChart {
 
 		return (
 			`https://console.aws.amazon.com/cloudwatch/home?${region}` +
-			`#logEventViewer:group=${encodeURIComponent(logGroupName)}` +
-			(filterPattern ? `;filter=${encodeURIComponent(filterPattern)}` : "") +
-			`;start=${logsTimeRange.start};end=${logsTimeRange.end}`
+			`#logEventViewer:group=${encodeURIComponent(logGroupName)}${filterPattern ? `;filter=${encodeURIComponent(filterPattern)}` : ""};start=${logsTimeRange.start};end=${logsTimeRange.end}`
 		);
 	}
 
 	getURL() {
 		if (!this.metrics) {
-			throw "No metrics have been defined";
+			throw new Error("No metrics have been defined");
 		}
 		if (
 			this.width > 1000 ||
@@ -505,25 +503,24 @@ class AwsCloudWatchChart {
 			"cht=ls", // chart type
 			"chma=20,15,5,5|0,20", // padding (data only, not axis)
 			"chxt=x,y", // axis to show
-			"chxl=0:|" + _.join(labels, "|"),
-			"chco=" + _.join(colors, ","), // line colors
-			"chls=" + _.join(styles, "|"), // line style <thickness,dash-length,space-length>|...
-			"chs=" + this.width + "x" + this.height,
+			`chxl=0:|${_.join(labels, "|")}`,
+			`chco=${_.join(colors, ",")}`, // line colors
+			`chls=${_.join(styles, "|")}`, // line style <thickness,dash-length,space-length>|...
+			`chs=${this.width}x${this.height}`,
 			// axis scale (must be separate from data scale)
-			"chxr=1,0," + topEdge + "," + Math.floor((topEdge / this.height) * 20),
+			`chxr=1,0,${topEdge},${Math.floor((topEdge / this.height) * 20)}`,
 			"chg=20,10,1,5",
 			// Legend
-			"chdl=" +
-				_.join(
-					_.map(titles, (t) => encodeURIComponent(t)),
-					"|",
-				),
+			`chdl=${_.join(
+				_.map(titles, (t) => encodeURIComponent(t)),
+				"|",
+			)}`,
 			"chdlp=b", // put legend at bottom
 			// Data (last in case of truncation)
-			"chd=e:" + _.join(points, ","),
+			`chd=e:${_.join(points, ",")}`,
 		];
 
-		return "https://chart.googleapis.com/chart?" + _.join(params, "&");
+		return `https://chart.googleapis.com/chart?${_.join(params, "&")}`;
 	}
 
 	/**
@@ -573,7 +570,7 @@ class AwsCloudWatchChartMetric {
 		const percentiles = _.filter(stats, (s) => /^p\d\d/i.test(s));
 		if (percentiles.length) {
 			if (percentiles.length < stats.length) {
-				throw "Can only use p00.00 -or- normal statistics, not both!";
+				throw new Error("Can only use p00.00 -or- normal statistics, not both!");
 			}
 			this.query.ExtendedStatistics = percentiles;
 			delete this.query.Statistics;

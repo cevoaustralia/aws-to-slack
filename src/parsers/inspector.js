@@ -78,7 +78,7 @@ exports.parse = (event) => {
 	if (!_.isEmpty(run)) {
 		fields.push({
 			title: "Run",
-			value: "<" + getUrlForRun("run", run) + `|${run}>\n`,
+			value: `<${getUrlForRun("run", run)}|${run}>\n`,
 			short: false,
 		});
 	}
@@ -93,7 +93,7 @@ exports.parse = (event) => {
 		case "ASSESSMENT_RUN_COMPLETED":
 			title = "Assessment run summary";
 			color = event.COLORS.ok;
-			text += "*<" + getUrlForRun("finding", run) + "|Findings>*\n";
+			text += `*<${getUrlForRun("finding", run)}|Findings>*\n`;
 			if (!_.isEmpty(findingsCount)) {
 				const parsedFindings = _.split(
 					_.replace(findingsCount, /[{}]/g, ""),
@@ -145,10 +145,10 @@ exports.parse = (event) => {
 	return event.attachmentWithDefaults({
 		author_name: "Amazon Inspector",
 		fallback: text,
-		color: color,
-		title: title,
-		text: text,
-		fields: fields,
+		color,
+		title,
+		text,
+		fields,
 		mrkdwn_in: ["text"],
 	});
 };

@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 // The generic parser is intended to match anything that DOES NOT match another parser.
 // Update these examples below if they happen to match your custom parser format.
 
@@ -7,7 +5,8 @@ const snsMessageThatMatchesNothing = {
 	Records: [
 		{
 			EventVersion: "1.0",
-			EventSubscriptionArn: `arn:aws:sns:region:account-id:topicname:subscriptionid`,
+			EventSubscriptionArn:
+				"arn:aws:sns:region:account-id:topicname:subscriptionid",
 			EventSource: "aws:sns",
 			Sns: {
 				SignatureVersion: "1",
@@ -15,7 +14,7 @@ const snsMessageThatMatchesNothing = {
 				Signature: "EXAMPLE",
 				SigningCertUrl: "EXAMPLE",
 				MessageId: "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
-				Message: `foo`,
+				Message: "foo",
 				MessageAttributes: {
 					Test: {
 						Type: "String",
@@ -28,7 +27,7 @@ const snsMessageThatMatchesNothing = {
 				},
 				Type: "Notification",
 				UnsubscribeUrl: "EXAMPLE",
-				TopicArn: `arn:aws:sns:region:account-id:topicname`,
+				TopicArn: "arn:aws:sns:region:account-id:topicname",
 				Subject: "TestInvoke",
 			},
 		},
@@ -56,12 +55,13 @@ const eventThatMatchesNothing = {
 	version: 2,
 };
 
-const mock = require("./_parser_mock").named("generic"),
-	EventDef = require("../../src/eventdef");
+const mock = require("./_parser_mock").named("generic");
+const EventDef = require("../../src/eventdef");
+
 mock.matchesEvent(snsMessageThatMatchesNothing);
 mock.matchesEvent(eventThatMatchesNothing);
 
-test(`Parser[generic] will match event and provide detail`, async () => {
+test("Parser[generic] will match event and provide detail", async () => {
 	const event = {
 		test1: "test89",
 		test8: 7,

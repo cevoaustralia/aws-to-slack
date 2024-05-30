@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 // AWS example event: codepipeline.StateChange.ManualApproval.json
 const exampleManualApprovalStateChange = {
 	version: "0",

@@ -30,7 +30,8 @@ exports.parse = async (event) => {
 	}
 
 	// Render chart
-	let image_url, logsUrl;
+	let image_url;
+	let logsUrl;
 	try {
 		const chart = await getChart(event);
 		logsUrl = chart.getCloudWatchURL(event.getTime(), region);
@@ -49,7 +50,7 @@ exports.parse = async (event) => {
 
 	return event.attachmentWithDefaults({
 		fallback: `${alarmName} state is now ${newState}:\n${reason}`,
-		color: color,
+		color,
 		author_name: `AWS CloudWatch Alarm (${accountId})`,
 		title: alarmName,
 		title_link: event.consoleUrl(

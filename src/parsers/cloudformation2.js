@@ -51,7 +51,7 @@ exports.parse = (event) => {
 	});
 
 	if (requestParameters) {
-		for (var name in requestParameters) {
+		for (const name in requestParameters) {
 			const value = requestParameters[name];
 
 			if (
@@ -64,7 +64,7 @@ exports.parse = (event) => {
 			} else {
 				fields.push({
 					title: name,
-					value: value,
+					value,
 					short: true,
 				});
 			}
@@ -79,7 +79,7 @@ exports.parse = (event) => {
 		});
 	}
 
-	let stackName = `Unknown`;
+	let stackName = "Unknown";
 
 	if (requestParameters) {
 		stackName = _.get(requestParameters, "stackName");
@@ -89,12 +89,12 @@ exports.parse = (event) => {
 
 	return event.attachmentWithDefaults({
 		author_name: "AWS CloudFormation",
-		title: title,
+		title,
 		// title_link: consoleLink,
 		fallback: `${stackName}: ${title}`,
 		// color: color,
 		ts: new Date(time),
-		fields: fields,
+		fields,
 	});
 };
 

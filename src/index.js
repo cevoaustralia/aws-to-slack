@@ -1,39 +1,41 @@
-const _ = require("lodash"),
-	EventDef = require("./eventdef"),
-	Slack = require("./slack"),
-	Emailer = require("./ses"),
-	defaultParserWaterfall = [
-		// Ordered list of parsers:
-		"cloudwatch",
-		"codecommit/pullrequest",
-		"codecommit/repository",
-		"autoscaling",
-		"aws-health",
-		"batch-events",
-		"beanstalk",
-		"cloudformation",
-		"cloudformation2",
-		"codebuild",
-		"codedeployCloudWatch",
-		"codedeploySns",
-		"codepipeline",
-		"codepipeline-approval",
-		"guardduty",
-		"securityhub",
-		"inspector",
-		"rds",
-		"ecs-event",
-		"ses-bounce",
-		"ses-complaint",
-		"ses-received",
-		// Last attempt to parse, will match any message:
-		"generic",
-	];
+const _ = require("lodash");
+const EventDef = require("./eventdef");
+const Slack = require("./slack");
+const Emailer = require("./ses");
+
+const defaultParserWaterfall = [
+	// Ordered list of parsers:
+	"cloudwatch",
+	"codecommit/pullrequest",
+	"codecommit/repository",
+	"autoscaling",
+	"aws-health",
+	"batch-events",
+	"beanstalk",
+	"cloudformation",
+	"cloudformation2",
+	"codebuild",
+	"codedeployCloudWatch",
+	"codedeploySns",
+	"codepipeline",
+	"codepipeline-approval",
+	"guardduty",
+	"securityhub",
+	"inspector",
+	"rds",
+	"ecs-event",
+	"ses-bounce",
+	"ses-complaint",
+	"ses-received",
+	// Last attempt to parse, will match any message:
+	"generic",
+];
 
 class LambdaHandler {
 	constructor(waterfall = defaultParserWaterfall) {
 		this.lastParser = null;
 		this.parsers = _.map(waterfall, (name) => {
+			/* eslint-disable import/no-dynamic-require */
 			const parser = require(`./parsers/${name}`);
 			if (!parser.name) {
 				// modify package in-memory

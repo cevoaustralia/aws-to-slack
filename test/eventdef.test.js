@@ -1,8 +1,6 @@
-/* eslint-disable */
-
 const EventDef = require("../src/eventdef");
 
-test(`EventDef parses raw event`, async () => {
+test("EventDef parses raw event", async () => {
 	const testArn = "arn:aws:glue:eu-west-1:123456789012:table/d1/t1:suffix";
 	const event = {
 		test1: "test89",
@@ -25,7 +23,7 @@ test(`EventDef parses raw event`, async () => {
 	expect(result.getTime()).toEqual(undefined);
 });
 
-test(`EventDef parses SNS event`, async () => {
+test("EventDef parses SNS event", async () => {
 	const testArn = "arn:aws:glue:eu-west-1:123456789015:table/d1/t1";
 	const ParserMock = require("./parsers/_parser_mock");
 	const event = {
@@ -47,7 +45,7 @@ test(`EventDef parses SNS event`, async () => {
 	expect(result.getTime()).toBeTruthy();
 });
 
-test(`EventDef falls back to SNS details`, async () => {
+test("EventDef falls back to SNS details", async () => {
 	const ParserMock = require("./parsers/_parser_mock");
 	const event = {
 		source: "aws.foobar",
@@ -66,7 +64,7 @@ test(`EventDef falls back to SNS details`, async () => {
 	expect(result.getSource()).toEqual("foobar");
 });
 
-test(`EventDef creates console links`, () => {
+test("EventDef creates console links", () => {
 	const evt = new EventDef({
 		Records: [{ region: "us-west-7" }],
 	});

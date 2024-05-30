@@ -33,7 +33,7 @@ exports.parse = (event) => {
 		author_name: "Amazon SES",
 		title: subject,
 		text: content,
-		fields: fields,
+		fields,
 		ts: new Date(timestamp),
 	});
 };

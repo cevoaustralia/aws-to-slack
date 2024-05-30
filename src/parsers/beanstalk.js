@@ -92,11 +92,11 @@ exports.parse = (event) => {
 
 	return event.attachmentWithDefaults({
 		fallback: `${application} / ${environment}: ${text}`,
-		color: color,
+		color,
 		author_name: "AWS Elastic Beanstalk",
 		title: `${application} / ${environment}`,
 		title_link: environmentUrl,
-		text: text,
+		text,
 		fields: [
 			{
 				title: "Application",

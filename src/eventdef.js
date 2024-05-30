@@ -167,12 +167,12 @@ class EventDef {
 		// ensure link contains scheme + domain
 		let url = String(path);
 		if (_.startsWith(url, "//")) {
-			url = "https:" + url;
+			url = `https:${url}`;
 		} else if (_.startsWith(url, "/")) {
 			if (_.startsWith(region, "cn-")) {
-				url = "https://console.amazonaws.cn" + url;
+				url = `https://console.amazonaws.cn${url}`;
 			} else {
-				url = "https://console.aws.amazon.com" + url;
+				url = `https://console.aws.amazon.com${url}`;
 			}
 		}
 
@@ -181,15 +181,15 @@ class EventDef {
 			const u = _urllib.parse(url);
 			if (u) {
 				const qs = require("querystring");
-				let hasRegion = false,
-					qsObj = {};
+				let foundRegion = false;
+				let qsObj = {};
 				if (u.query) {
 					qsObj = qs.parse(u.query) || {};
 					if (qsObj.region) {
-						hasRegion = true;
+						foundRegion = true;
 					}
 				}
-				if (!hasRegion) {
+				if (!foundRegion) {
 					// add region and re-generate link
 					qsObj.region = region;
 					url = `${u.protocol}//${u.host}${u.pathname || ""}?${qs.stringify(qsObj)}${u.hash || ""}`;
@@ -230,7 +230,7 @@ class EventDef {
 				const signin = `https://${arn.account}.signin.aws.amazon.com/console/sns?region=${arn.region}`;
 				// limit visible length of topic
 				const topicVisible =
-					topic.length > 40 ? topic.substr(0, 35) + "..." : topic;
+					topic.length > 40 ? `${topic.substr(0, 35)}...` : topic;
 
 				const snsLink = this.getLink(`SNS ${topicVisible}`, url);
 				const signinLink = this.getLink("Sign-In", signin);

@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const example = {
 	version: "0",
 	id: "0025bc20-ad26-59f8-f11e-c36022019c04",
@@ -31,6 +29,7 @@ const example = {
 
 // Configure aws-sdk to fail-fast
 const AWS = require("aws-sdk");
+
 AWS.config.credentials = new AWS.Credentials({
 	accessKeyId: "foo",
 	secretAccessKey: "bar",

@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const subject = "AWS CloudFormation Notification";
 
 // LogicalResourceId === StackName

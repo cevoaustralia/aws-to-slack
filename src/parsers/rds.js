@@ -16,7 +16,7 @@ exports.parse = (event) => {
 		author_name: "Amazon RDS",
 		title: instanceId,
 		title_link: link,
-		text: text,
+		text,
 		ts: new Date(time),
 	});
 };

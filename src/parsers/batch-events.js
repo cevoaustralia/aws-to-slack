@@ -48,9 +48,9 @@ exports.parse = (event) => {
 	return event.attachmentWithDefaults({
 		author_name: "AWS Batch Notification",
 		fallback: `${baseTitle} ${status}`,
-		color: color,
-		title: title,
-		fields: fields,
+		color,
+		title,
+		fields,
 		mrkdwn_in: ["title", "text"],
 	});
 };

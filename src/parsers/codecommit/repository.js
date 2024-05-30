@@ -82,7 +82,7 @@ exports.parse = async (event) => {
 			const res = await client
 				.getCommit({
 					repositoryName: repoName,
-					commitId: commitId,
+					commitId,
 				})
 				.promise();
 			fields.push({
@@ -104,10 +104,10 @@ exports.parse = async (event) => {
 	return event.attachmentWithDefaults({
 		author_name: "AWS CodeCommit",
 		fallback: `${repoName}: ${title}`,
-		color: color,
-		title: title,
+		color,
+		title,
 		title_link: repoUrl,
-		fields: fields,
+		fields,
 		mrkdwn_in: ["title", "text"],
 	});
 };

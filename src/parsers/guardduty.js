@@ -303,7 +303,7 @@ exports.parse = (event) => {
 
 			fields.push({
 				title: key,
-				value: value,
+				value,
 				short: true,
 			});
 		}
@@ -340,7 +340,6 @@ exports.parse = (event) => {
 
 		const name = _.get(cluster, "name");
 		const arn = _.get(cluster, "arn");
-		const createdAt = _.get(cluster, "createdAt");
 		const vpcId = _.get(cluster, "vpcId");
 		const status = _.get(cluster, "status");
 
@@ -393,7 +392,7 @@ exports.parse = (event) => {
 
 			fields.push({
 				title: key,
-				value: value,
+				value,
 				short: true,
 			});
 		}
@@ -401,7 +400,7 @@ exports.parse = (event) => {
 		console.log(`Unknown GuardDuty resourceType '${resourceType}'`);
 
 		fields.push({
-			title: "Unknown Resource Type (" + resourceType + ")",
+			title: `Unknown Resource Type (${resourceType})`,
 			value: JSON.stringify(_.get(detail, "resource"), null, 2),
 			short: false,
 		});
@@ -420,9 +419,9 @@ exports.parse = (event) => {
 	return event.attachmentWithDefaults({
 		author_name: "Amazon GuardDuty",
 		fallback: `${title} ${description}`,
-		color: color,
-		title: title,
-		fields: fields,
+		color,
+		title,
+		fields,
 		mrkdwn_in: ["title", "text"],
 		ts: createdAt,
 	});

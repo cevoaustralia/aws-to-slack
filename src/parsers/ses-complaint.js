@@ -30,7 +30,7 @@ exports.parse = (event) => {
 		});
 	}
 
-	let color = event.COLORS.critical;
+	const color = event.COLORS.critical;
 
 	fields.push({
 		title: "UserAgent",
@@ -46,11 +46,11 @@ exports.parse = (event) => {
 
 	return event.attachmentWithDefaults({
 		fallback: `Complaint: ${userAgent}`,
-		color: color,
+		color,
 		author_name: `Amazon SES - Complaint: ${userAgent}`,
 		title: subject,
 		text: JSON.stringify(complainedRecipients),
-		fields: fields,
+		fields,
 		ts: new Date(timestamp),
 	});
 };
