@@ -1,22 +1,5 @@
-env:
-  commonjs: true
-  es6: true
-  jest: true
-  node: true
-
-globals:
-  Atomics: readonly
-  SharedArrayBuffer: readonly
-
-ignorePatterns:
-  - "!.*"
-  - "**/node_modules/.*"
-  - "**/dist/.*"
-  - "**/coverage/.*"
-  - "*.json"
-
-parser: "@babel/eslint-parser"
-
+---
+# Based on the AirBnb JavaScript styleguides with our own twist
 parserOptions:
   ecmaVersion: 2023
   sourceType: module
@@ -27,27 +10,63 @@ parserOptions:
     presets:
       - jest
 
-plugins:
-  - jest
-  - prettier
+env:
+  commonjs: true
+  es6: true
+  jest: true
+  node: true
+
+globals:
+  _: readonly
+  Atomics: readonly
+  SharedArrayBuffer: readonly
 
 extends:
   - eslint:recommended
   - plugin:github/recommended
   - plugin:jest/recommended
+  - plugin:lodash/canonical
+  - plugin:lodash/recommended
+  - plugin:promise/recommended
+  - plugin:import/errors
+  - plugin:import/warnings
+
+plugins:
+  - promise
+  - lodash
+  - import
+  - jest
+  - prettier
 
 rules:
-  {
-    "camelcase": "off",
-    "brace-style": "off",
-    "indent": "off",
-    "eslint-comments/no-use": "off",
-    "eslint-comments/no-unused-disable": "off",
-    "i18n-text/no-en": "off",
-    "import/no-commonjs": "off",
-    "import/no-namespace": "off",
-    "no-console": "off",
-    "no-unused-vars": "off",
-    "prettier/prettier": "error",
-    "semi": "off",
-  }
+  indent: [ error, tab, {
+    MemberExpression: off
+  } ]
+  linebreak-style: [ error, unix ]
+  semi: [ error, always ]
+  quotes: [ error, double, { avoidEscape: true } ]
+  curly: error
+  no-console: off
+  no-mixed-spaces-and-tabs: error
+  space-before-blocks: error
+  arrow-spacing: error
+  key-spacing: [ error, { afterColon: true, mode: minimum } ]
+  brace-style: [ error, stroustrup ]
+  comma-spacing: [ error, { before: false, after: true } ]
+  comma-style: [ error, last, { exceptions: { VariableDeclaration: true } } ]
+  array-bracket-spacing: off # [ error, always, { singleValue: false } ]
+  computed-property-spacing: [ error, never ]
+  object-curly-spacing: [ error, always ]
+  prefer-const: error
+  no-var: error
+  valid-jsdoc: [ warn, { prefer: { "arg": "param", "argument": "param", "class": "constructor", "return": "returns", "virtual": "abstract" } } ]
+  promise/no-nesting: off
+  import/first: error
+  import/newline-after-import: error
+  import/no-named-as-default: off
+  import/no-extraneous-dependencies: [ error, { devDependencies: true } ]
+  lodash/import-scope: off
+  lodash/preferred-alias: off
+  lodash/prop-shorthand: off
+  lodash/prefer-constant: off
+  lodash/prefer-lodash-method: [ error, { ignoreObjects: [ ] } ]
