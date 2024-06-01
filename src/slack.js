@@ -92,7 +92,9 @@ class Slack {
 				throw e;
 			}
 
-			throw new Error(`Slack API error [HTTP:${response.statusCode}]: ${response.body}`);
+			throw new Error(
+				`Slack API error [HTTP:${response.statusCode}]: ${response.body}`,
+			);
 		});
 	}
 }

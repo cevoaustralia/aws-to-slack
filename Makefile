@@ -108,3 +108,14 @@ publish: $(usesReleaseZip) $(REGIONS)
 $(REGIONS):
 	aws $(awsProfile) s3 cp "./cloudformation.yaml" "s3://$(BUCKET_PREFIX)-$@" --acl public-read
 	aws $(awsProfile) s3 cp "$(RELEASE_ZIP)" "s3://$(BUCKET_PREFIX)-$@" --acl public-read
+
+
+pre-commit:
+	npm run test
+	npm run format:check
+	npm run lint
+
+pre-commit-fix:
+	npm run test
+	npm run format:write
+	npm run lint

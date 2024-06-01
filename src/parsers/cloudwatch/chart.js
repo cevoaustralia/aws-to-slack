@@ -297,7 +297,9 @@ class AwsCloudWatchChart {
 		let fromTime = Date.now();
 		const validDatapoints = _.filter(this.metrics, (m) => m.datapoints.length);
 		if (!validDatapoints.length) {
-			throw new Error("No datapoints returned from CloudWatch, cannot render empty chart");
+			throw new Error(
+				"No datapoints returned from CloudWatch, cannot render empty chart",
+			);
 		}
 
 		_.each(validDatapoints, (m) => {
@@ -329,11 +331,11 @@ class AwsCloudWatchChart {
 			i += (toTime - fromTime) / chartSamples;
 			const to = i;
 			const d = new Date(to);
+			const hr = `0${d.getUTCHours()}`.slice(-2);
+			const min = `0${d.getUTCMinutes()}`.slice(-2);
+
 			timeSlots.push({
-				text:
-					("0" + d.getUTCHours()).slice(-2) +
-					":" +
-					("0" + d.getUTCMinutes()).slice(-2),
+				text: `${hr}:${min}`,
 				from,
 				to,
 			});
@@ -570,7 +572,9 @@ class AwsCloudWatchChartMetric {
 		const percentiles = _.filter(stats, (s) => /^p\d\d/i.test(s));
 		if (percentiles.length) {
 			if (percentiles.length < stats.length) {
-				throw new Error("Can only use p00.00 -or- normal statistics, not both!");
+				throw new Error(
+					"Can only use p00.00 -or- normal statistics, not both!",
+				);
 			}
 			this.query.ExtendedStatistics = percentiles;
 			delete this.query.Statistics;

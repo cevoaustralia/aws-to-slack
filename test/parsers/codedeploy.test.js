@@ -20,4 +20,4 @@ const example = {
 	},
 };
 
-require("./_parser_mock").named("codedeployCloudWatch").matchesEvent(example);
+require("./_parser_mock").named("codedeploy-cloudwatch").matchesEvent(example);
