@@ -2,8 +2,7 @@
 // AWS GuardDuty event parser
 //
 exports.matches = event =>
-	event.getSource() === "guardduty"
-	|| _.get(event.message, "detail.service.serviceName") === "guardduty";
+	event.getSource() === "guardduty" && event.getDetailType() === "GuardDuty Finding"
 
 exports.parse = event => {
 	const detail = event.get("detail");
@@ -17,51 +16,6 @@ exports.parse = event => {
 	const fields = [];
 
 	const eventName = _.get(detail, "eventName")
-
-	if (eventName === "ArchiveFindings" || eventName === "UnarchiveFindings") {
-		let actionedBy = _.get(detail, "userIdentity.principalId")
-		accountId = _.get(detail, "recipientAccountId");
-		region = _.get(detail, "awsRegion");
-		title = "Findings Archived"
-		description = `Findings Archived by ${actionedBy}`
-		color = event.COLORS.ok;
-
-		if (eventName === "UnarchiveFindings") {
-			title = "Findings Unarchived"
-			description = `Findings Unarchived by ${actionedBy}`
-			color = event.COLORS.warning;
-		}
-
-		fields.push({
-			title: "Account",
-			value: accountId,
-			short: true
-		});
-
-		fields.push({
-			title: "Region",
-			value: region,
-			short: true
-		});
-
-		fields.push({
-			title: "Actioned by",
-			value: actionedBy,
-			short: false
-		});
-
-		const findings = _.get(detail, "requestParameters.findingIds");
-
-		for (const finding of findings) {
-			fields.push({
-				title: "Finding ID",
-				value: finding,
-				short: false
-			});
-		}
-
-	}
-	else {
 
 	//const id = _.get(detail, "id");
 	const severity = _.get(detail, "severity");
@@ -429,7 +383,6 @@ exports.parse = event => {
 	}
     	if (severity > 7) { //high sevirity above 7
 		color = event.COLORS.critical;
-	}
 	}
 
 	return event.attachmentWithDefaults({
