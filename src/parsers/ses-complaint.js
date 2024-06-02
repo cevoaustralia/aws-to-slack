@@ -30,7 +30,7 @@ exports.parse = event => {
 		});
 	}
 
-	let color = event.COLORS.critical
+	const color = event.COLORS.critical;
 	
 	fields.push({
 		title: "UserAgent",

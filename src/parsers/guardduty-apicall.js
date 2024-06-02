@@ -2,31 +2,26 @@
 // AWS GuardDuty event parser
 //
 exports.matches = event =>
-	event.getSource() === "guardduty" && event.getDetailType() === "AWS API Call via CloudTrail"
+	event.getSource() === "guardduty" && event.getDetailType() === "AWS API Call via CloudTrail";
 
 exports.parse = event => {
 	const detail = event.get("detail");
 
-	let title = _.get(detail, "title");
-	let description = _.get(detail, "description");
 	const createdAt = new Date(_.get(detail, "time"));
-	let accountId = _.get(detail, "accountId");
-	let region = _.get(detail, "region");
-	let color = event.COLORS.neutral; //low severity below 4
 	const fields = [];
 
-	const eventName = _.get(detail, "eventName")
+	const eventName = _.get(detail, "eventName");
+	const actionedBy = _.get(detail, "userIdentity.principalId");
+	const accountId = _.get(detail, "recipientAccountId");
+	const region = _.get(detail, "awsRegion");
 
-	let actionedBy = _.get(detail, "userIdentity.principalId")
-	accountId = _.get(detail, "recipientAccountId");
-	region = _.get(detail, "awsRegion");
-	title = "Findings Archived"
-	description = `Findings Archived by ${actionedBy}`
-	color = event.COLORS.ok;
+	let title = "Findings Archived";
+	let description = `Findings Archived by ${actionedBy}`;
+	let color = event.COLORS.ok;
 
 	if (eventName === "UnarchiveFindings") {
-		title = "Findings Unarchived"
-		description = `Findings Unarchived by ${actionedBy}`
+		title = "Findings Unarchived";
+		description = `Findings Unarchived by ${actionedBy}`;
 		color = event.COLORS.warning;
 	}
 

@@ -17,18 +17,18 @@ exports.parse = event => {
 	const finding = _.get(detail, "findings")[0];
 	console.log(`Finding ${JSON.stringify(finding, null, 2)}`);
 
-	const id = _.get(finding, "Id");
-	const generatorId = _.get(finding, "GeneratorId");
+	// const id = _.get(finding, "Id");
+	// const generatorId = _.get(finding, "GeneratorId");
 	const title = _.get(finding, "Title");
 	const description = _.get(finding, "Description");
 	const createdAt = new Date(_.get(finding, "CreatedAt"));
-	const updatedAt = new Date(_.get(finding, "UpdatedAt"));
+	// const updatedAt = new Date(_.get(finding, "UpdatedAt"));
 	const firstSeen = new Date(_.get(finding, "FirstObservedAt"));
 	const lastSeen = new Date(_.get(finding, "LastObservedAt"));
-	const complianceStatus = _.get(finding, "Compliance.Status");
+	// const complianceStatus = _.get(finding, "Compliance.Status");
 	const severity = _.get(finding, "Severity.Normalized");
 	const severityLabel = _.get(finding, "Severity.Label");
-	const criticality = _.get(finding, "Criticality");
+	// const criticality = _.get(finding, "Criticality");
 
 	const accountId = _.get(finding, "AwsAccountId");
 	const resources = _.get(finding, "Resources");
