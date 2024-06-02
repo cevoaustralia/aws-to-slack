@@ -88,6 +88,15 @@ class EventDef {
 	}
 
 	/**
+	 * Get detail type from current record.
+	 *
+	 * @returns {string|undefined} The detail-type field
+	 */
+	getDetailType() {
+		return _.get(this.message, "detail-type");
+	}
+
+	/**
 	 * Get SNS subject from current record.
 	 *
 	 * @returns {string|undefined} The Sns.Subject field

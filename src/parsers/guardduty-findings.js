@@ -2,26 +2,27 @@
 // AWS GuardDuty event parser
 //
 exports.matches = event =>
-	event.getSource() === "guardduty"
-	|| _.get(event.message, "detail.service.serviceName") === "guardduty";
+	event.getSource() === "guardduty" && event.getDetailType() === "GuardDuty Finding";
 
 exports.parse = event => {
 	const detail = event.get("detail");
 
-	//const id = _.get(detail, "id");
 	const title = _.get(detail, "title");
 	const description = _.get(detail, "description");
 	const createdAt = new Date(_.get(detail, "time"));
-	const severity = _.get(detail, "severity");
 	const accountId = _.get(detail, "accountId");
 	const region = _.get(detail, "region");
+	let color = event.COLORS.neutral; //low severity below 4
+	const fields = [];
+
+	//const id = _.get(detail, "id");
+	const severity = _.get(detail, "severity");
 	//const partition = _.get(event, "partition");
 	//const arn = _.get(event, "arn");
 	const type = _.get(detail, "type");
 
 	const threatName = _.get(detail, "service.additionalInfo.threatName");
 	const threatListName = _.get(detail, "service.additionalInfo.threatListName");
-	const fields = [];
 
 	fields.push({
 		title: "Description",
@@ -130,7 +131,7 @@ exports.parse = event => {
 
 		const connectionDirection = _.get(detectedAction, "connectionDirection");
 		const protocol = _.get(detectedAction, "protocol");
-		const blocked = _.get(detectedAction, "blocked");
+		// const blocked = _.get(detectedAction, "blocked");
 
 		const ipAddressV4 = _.get(detectedAction, "remoteIpDetails.ipAddressV4");
 		const isp = _.get(detectedAction, "remoteIpDetails.organization.isp");
@@ -139,12 +140,12 @@ exports.parse = event => {
 		const country = _.get(detectedAction, "remoteIpDetails.country.countryName");
 		const city = _.get(detectedAction, "remoteIpDetails.city.cityName");
 
-		const remotePort = _.get(detectedAction, "remotePortDetails.port");
-		const remotePortName = _.get(detectedAction, "remotePortDetails.portName");
+		// const remotePort = _.get(detectedAction, "remotePortDetails.port");
+		// const remotePortName = _.get(detectedAction, "remotePortDetails.portName");
 
 		const localIpAddress = _.get(detectedAction, "localIpDetails.ipAddressV4");
 		const localPort = _.get(detectedAction, "localPortDetails.port");
-		const localPortName = _.get(detectedAction, "localPortDetails.portName");
+		// const localPortName = _.get(detectedAction, "localPortDetails.portName");
 
 
 		fields.push({
@@ -164,12 +165,6 @@ exports.parse = event => {
 			value: `${country} - ${city}`,
 			short: true
 		});
-		//
-		// fields.push({
-		// 	title: "Remote Details",
-		// 	value: `${remotePort} (${remotePortName})`,
-		// 	short: true
-		// });
 	}
 	else if (actionType === "KUBERNETES_API_CALL") {
 
@@ -310,7 +305,7 @@ exports.parse = event => {
 
 		const name = _.get(cluster, "name");
 		const arn = _.get(cluster, "arn");
-		const createdAt = _.get(cluster, "createdAt");
+		// const createdAt = _.get(cluster, "createdAt");
 		const vpcId = _.get(cluster, "vpcId");
 		const status = _.get(cluster, "status");
 
@@ -326,14 +321,14 @@ exports.parse = event => {
 			short: true
 		});
 
-		const kubernetesDetails = _.get(detail, "resource.kubernetesDetails")
-		const workloadDetails = _.get(kubernetesDetails, "kubernetesWorkloadDetails")
+		const kubernetesDetails = _.get(detail, "resource.kubernetesDetails");
+		const workloadDetails = _.get(kubernetesDetails, "kubernetesWorkloadDetails");
 		fields.push({
 			title: "Workload",
 			value: workloadDetails,
 			short: true
 		});
-		const userDetails = _.get(kubernetesDetails, "kubernetesUserDetails")
+		const userDetails = _.get(kubernetesDetails, "kubernetesUserDetails");
 
 		const username= _.get(userDetails, "username");
 		const uid = _.get(userDetails, "uid");
@@ -352,7 +347,7 @@ exports.parse = event => {
 			short: true
 		});
 
-		const tags = _.get(cluster	, "tags");
+		const tags = _.get(cluster, "tags");
 
 		for (let i = 0; i < tags.length; i++) {
 			const key = tags[i].key;
@@ -375,11 +370,10 @@ exports.parse = event => {
 		});
 	}
 
-	let color = event.COLORS.neutral; //low severity below 4
 	if (severity > 4) { //medium seveirty between 4 and 7
 		color = event.COLORS.warning;
 	}
-    	if (severity > 7) { //high sevirity above 7
+	if (severity > 7) { //high sevirity above 7
 		color = event.COLORS.critical;
 	}
 

@@ -1,0 +1,66 @@
+//
+// AWS GuardDuty event parser
+//
+exports.matches = event =>
+	event.getSource() === "guardduty" && event.getDetailType() === "AWS API Call via CloudTrail";
+
+exports.parse = event => {
+	const detail = event.get("detail");
+
+	const createdAt = new Date(_.get(detail, "time"));
+	const fields = [];
+
+	const eventName = _.get(detail, "eventName");
+	const actionedBy = _.get(detail, "userIdentity.principalId");
+	const accountId = _.get(detail, "recipientAccountId");
+	const region = _.get(detail, "awsRegion");
+
+	let title = "Findings Archived";
+	let description = `Findings Archived by ${actionedBy}`;
+	let color = event.COLORS.ok;
+
+	if (eventName === "UnarchiveFindings") {
+		title = "Findings Unarchived";
+		description = `Findings Unarchived by ${actionedBy}`;
+		color = event.COLORS.warning;
+	}
+
+	fields.push({
+		title: "Account",
+		value: accountId,
+		short: true
+	});
+
+	fields.push({
+		title: "Region",
+		value: region,
+		short: true
+	});
+
+	fields.push({
+		title: "Actioned by",
+		value: actionedBy,
+		short: false
+	});
+
+	const findings = _.get(detail, "requestParameters.findingIds");
+
+	for (const finding of findings) {
+		fields.push({
+			title: "Finding ID",
+			value: finding,
+			short: false
+		});
+	}
+
+
+	return event.attachmentWithDefaults({
+		author_name: "Amazon GuardDuty",
+		fallback: `${title} ${description}`,
+		color: color,
+		title: title,
+		fields: fields,
+		mrkdwn_in: ["title", "text"],
+		ts: createdAt,
+	});
+};

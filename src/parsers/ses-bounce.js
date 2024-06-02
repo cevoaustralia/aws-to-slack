@@ -12,7 +12,7 @@ exports.parse = event => {
 	const destination = event.get("mail.destination");
 	const timestamp = event.get("mail.timestamp");
 	const subject = event.get("mail.commonHeaders.subject");
-	const content = event.get("content");
+	// const content = event.get("content");
 
 	const fields = [];
 	if (source) {
@@ -30,7 +30,7 @@ exports.parse = event => {
 		});
 	}
 
-	let color = event.COLORS.neutral
+	let color = event.COLORS.neutral;
 	if (bounceType === "Transient") {
 		color = event.COLORS.accent;
 	}

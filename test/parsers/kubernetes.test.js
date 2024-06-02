@@ -3,6 +3,9 @@
 // The generic parser is intended to match anything that DOES NOT match another parser.
 // Update these examples below if they happen to match your custom parser format.
 
+const findingsMock = require("./_parser_mock").named("guardduty-findings");
+const runtimeMock = require("./_parser_mock").named("guardduty-kuberuntime");
+
 const simpleSnsPacket = {
 	Records: [{
 			"EventSource": "aws:sns",
@@ -26,12 +29,77 @@ const simpleSnsPacket = {
 };
 
 
-const mock = require("./_parser_mock").named("guardduty");
-mock.matchesEvent(simpleSnsPacket);
+findingsMock.matchesEvent(simpleSnsPacket);
 
-mock.matchesEventWithDetail(simpleSnsPacket, {
+findingsMock.matchesEventWithDetail(simpleSnsPacket, {
 	"author_name": "Amazon GuardDuty",
 	"color": "warning",
 	"fallback": "A Kubernetes API commonly used in Discovery tactics invoked from a known malicious IP address. A Kubernetes API commonly used in Discovery tactics was invoked on cluster eks-demo from known malicious IP address 167.94.145.97.",
 	"title": "A Kubernetes API commonly used in Discovery tactics invoked from a known malicious IP address."
+});
+
+
+const unhealthyRuntimeProtection = {
+	Records: [
+		{
+			"EventSource": "aws:sns",
+			"EventVersion": "1.0",
+			"EventSubscriptionArn": "arn:aws:sns:ap-southeast-2:EXAMPLE:aws-to-slack:6635ff10-c98f-455b-90f7-9b8386082633",
+			"Sns": {
+				"Type": "Notification",
+				"MessageId": "fb4becf1-f88c-5ff5-b12d-b2226236905b",
+				"TopicArn": "arn:aws:sns:ap-southeast-2:EXAMPLE:aws-to-slack",
+				"Subject": null,
+				"Message": "{\"version\":\"0\",\"id\":\"a2f5f101-a7a3-47b3-2287-e2a83135cf7a\",\"detail-type\":\"GuardDuty Runtime Protection Unhealthy\",\"source\":\"aws.guardduty\",\"account\":\"EXAMPLE\",\"time\":\"2024-05-31T09:29:28Z\",\"region\":\"ap-southeast-2\",\"resources\":[],\"detail\":{\"accountId\":\"EXAMPLE\",\"resourceDetails\":{\"resourceType\":\"EKS\",\"eksClusterDetails\":{\"clusterName\":\"eks-demo\",\"availableNodes\":-1,\"desiredNodes\":-1,\"addonDetails\":{\"addonVersion\":\"v1.6.1-eksbuild.1\",\"addonStatus\":\"DELETED\"}}},\"previousStatus\":\"Healthy\",\"currentStatus\":\"Unhealthy\",\"issue\":\"\",\"lastUpdatedAt\":1717147358760000}}",
+				"Timestamp": "2024-05-31T09:29:30.100Z",
+				"SignatureVersion": "1",
+				"Signature": "EXAMPLE",
+				"SigningCertUrl": "EXAMPLE",
+				"UnsubscribeUrl": "EXAMPLE",
+				"MessageAttributes": {}
+			}
+		}
+	]
+}
+
+runtimeMock.matchesEvent(unhealthyRuntimeProtection);
+
+runtimeMock.matchesEventWithDetail(unhealthyRuntimeProtection, {
+	"author_name": "Amazon GuardDuty",
+	"color": "danger",
+	"fallback": "GuardDuty Runtime Protection Unhealthy ",
+	"title": "GuardDuty Runtime Protection Unhealthy"
+});
+
+const healthyRuntimeProtection = {
+	"Records": [
+		{
+			"EventSource": "aws:sns",
+			"EventVersion": "1.0",
+			"EventSubscriptionArn": "arn:aws:sns:ap-southeast-2:EXAMPLE:aws-to-slack:6635ff10-c98f-455b-90f7-9b8386082633",
+			"Sns": {
+				"Type": "Notification",
+				"MessageId": "db0f2d8a-dabf-53a0-92de-73595e93e71b",
+				"TopicArn": "arn:aws:sns:ap-southeast-2:EXAMPLE:aws-to-slack",
+				"Subject": null,
+				"Message": "{\"version\":\"0\",\"id\":\"4eaf90cc-a2e2-06ab-1ac1-f464a1aa7412\",\"detail-type\":\"GuardDuty Runtime Protection Healthy\",\"source\":\"aws.guardduty\",\"account\":\"EXAMPLE\",\"time\":\"2024-05-31T07:53:14Z\",\"region\":\"ap-southeast-2\",\"resources\":[],\"detail\":{\"accountId\":\"EXAMPLE\",\"resourceDetails\":{\"resourceType\":\"EC2\",\"ec2InstanceDetails\":{\"instanceId\":\"i-0e5f6345341fd7144\",\"instanceType\":\"t3.medium\",\"clusterArn\":\"arn:aws:eks:ap-southeast-2:EXAMPLE:cluster/eks-demo\",\"agentDetails\":{\"version\":\"v1.6.1\"},\"managementType\":\"MANUAL\"}},\"previousStatus\":\"Unhealthy\",\"currentStatus\":\"Healthy\",\"issue\":\"\",\"lastUpdatedAt\":1717141247000}}",
+				"Timestamp": "2024-05-31T07:53:16.192Z",
+				"SignatureVersion": "1",
+				"Signature": "EXAMPLE",
+				"SigningCertUrl": "EXAMPLE",
+				"UnsubscribeUrl": "EXAMPLE",
+				"MessageAttributes": {}
+			}
+		}
+	]
+}
+
+
+runtimeMock.matchesEvent(healthyRuntimeProtection);
+
+runtimeMock.matchesEventWithDetail(healthyRuntimeProtection, {
+	"author_name": "Amazon GuardDuty",
+	"color": "good",
+	"fallback": "GuardDuty Runtime Protection Healthy ",
+	"title": "GuardDuty Runtime Protection Healthy"
 });
