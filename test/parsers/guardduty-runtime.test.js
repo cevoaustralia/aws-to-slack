@@ -141,7 +141,7 @@ runtimeMock.matchesEventWithDetail(healthyRuntimeProtection, {
 		{
 			"short": true,
 			"title": "Management Type",
-			"value": "MANUAL",
+			"value": "BLART",
 		},
 	]
 });
