@@ -198,11 +198,6 @@ runtimeMock.matchesEventWithDetail(healthyECSGuardDuty, {
 			"value": "buildkite-deploy-dev-Cluster-1O47RNJPQMRI6-EcsCluster-RPPZMvAnkFJP",
 		},
 		{
-			"short": false,
-			"title": "Issue",
-			"value": [],
-		},
-		{
 			"short": true,
 			"title": "Management Type",
 			"value": "AUTO_MANAGED",
