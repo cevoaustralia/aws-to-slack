@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="118" failures="1" errors="0" time="5.752">
+  <testsuite name="test/eventdef.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="3.608" tests="4">
+    <testcase classname="" name="EventDef parses raw event" time="0.021">
+    </testcase>
+    <testcase classname="" name="EventDef parses SNS event" time="0.039">
+    </testcase>
+    <testcase classname="" name="EventDef falls back to SNS details" time="0.001">
+    </testcase>
+    <testcase classname="" name="EventDef creates console links" time="0.011">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/batch-events.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="3.89" tests="4">
+    <testcase classname="Parser-Mock: batch-events" name="parser exists" time="0.104">
+    </testcase>
+    <testcase classname="Parser-Mock: batch-events" name="parser.parse() is called" time="0.357">
+    </testcase>
+    <testcase classname="Parser-Mock: batch-events" name="parser will match event" time="0.027">
+    </testcase>
+    <testcase classname="Parser-Mock: batch-events" name="parser is selected by Lambda handler" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/codebuild.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="3.921" tests="4">
+    <testcase classname="Parser-Mock: codebuild" name="parser exists" time="0.023">
+    </testcase>
+    <testcase classname="Parser-Mock: codebuild" name="parser.parse() is called" time="0.336">
+    </testcase>
+    <testcase classname="Parser-Mock: codebuild" name="parser will match event" time="0.045">
+    </testcase>
+    <testcase classname="Parser-Mock: codebuild" name="parser is selected by Lambda handler" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/cloudformation.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="3.885" tests="7">
+    <testcase classname="Parser-Mock: cloudformation" name="parser exists" time="0.036">
+    </testcase>
+    <testcase classname="Parser-Mock: cloudformation" name="parser.parse() is called" time="0.377">
+    </testcase>
+    <testcase classname="Parser-Mock: cloudformation" name="parser will match event" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: cloudformation" name="parser is selected by Lambda handler" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: cloudformation" name="parser matches event with truthy/empty object response" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: cloudformation" name="parser.parse() is called" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: cloudformation" name="parser forces Lambda handler to return null" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/codecommit.pullrequest2.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="4.047" tests="4">
+    <testcase classname="Parser-Mock: codecommit/pullrequest" name="parser exists" time="0.061">
+    </testcase>
+    <testcase classname="Parser-Mock: codecommit/pullrequest" name="parser.parse() is called" time="0.653">
+    </testcase>
+    <testcase classname="Parser-Mock: codecommit/pullrequest" name="parser will match event" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: codecommit/pullrequest" name="parser is selected by Lambda handler" time="0.007">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/aws-health.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="4.06" tests="4">
+    <testcase classname="Parser-Mock: aws-health" name="parser exists" time="0.004">
+    </testcase>
+    <testcase classname="Parser-Mock: aws-health" name="parser.parse() is called" time="0.311">
+    </testcase>
+    <testcase classname="Parser-Mock: aws-health" name="parser will match event" time="0.215">
+    </testcase>
+    <testcase classname="Parser-Mock: aws-health" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/generic.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="4.039" tests="9">
+    <testcase classname="Parser-Mock: generic" name="parser exists" time="0.086">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser.parse() is called" time="0.392">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser will match event" time="0.004">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser is selected by Lambda handler" time="0.043">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser.parse() is called" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: generic" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+    <testcase classname="" name="Parser[generic] will match event and provide detail" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/codepipeline.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="4.042" tests="20">
+    <testcase classname="Parser-Mock: codepipeline" name="parser exists" time="0.019">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser.parse() is called" time="0.405">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser will match event" time="0.018">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser.parse() is called" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser will match event" time="0.049">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser.parse() is called" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser will match event" time="0.015">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser is selected by Lambda handler" time="0.004">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser.parse() is called" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline" name="parser is selected by Lambda handler" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline-approval" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline-approval" name="parser.parse() is called" time="0.02">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline-approval" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: codepipeline-approval" name="parser is selected by Lambda handler" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/autoscaling.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:56:00" time="0.666" tests="4">
+    <testcase classname="Parser-Mock: autoscaling" name="parser exists" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: autoscaling" name="parser.parse() is called" time="0.055">
+    </testcase>
+    <testcase classname="Parser-Mock: autoscaling" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: autoscaling" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/codedeploy.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:56:00" time="0.354" tests="4">
+    <testcase classname="Parser-Mock: codedeployCloudWatch" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: codedeployCloudWatch" name="parser.parse() is called" time="0.005">
+    </testcase>
+    <testcase classname="Parser-Mock: codedeployCloudWatch" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: codedeployCloudWatch" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/guardduty-runtime.test.js" errors="0" failures="1" skipped="0" timestamp="2024-06-04T10:55:56" time="4.263" tests="25">
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser exists" time="0.122">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser.parse() is called" time="0.287">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser will match event" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser is selected by Lambda handler" time="0.039">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="matches event with detail" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser.parse() is called" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="matches event with detail" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser.parse() is called" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser will match event" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser is selected by Lambda handler" time="0.072">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="matches event with detail" time="0.012">
+      <failure>Error: expect(received).toMatchObject(expected)
+
+- Expected  - 1
++ Received  + 1
+
+@@ -39,10 +39,10 @@
+        &quot;value&quot;: &quot;v1.6.1&quot;,
+      },
+      Object {
+        &quot;short&quot;: true,
+        &quot;title&quot;: &quot;Management Type&quot;,
+-       &quot;value&quot;: &quot;BLART&quot;,
++       &quot;value&quot;: &quot;MANUAL&quot;,
+      },
+    ],
+    &quot;title&quot;: &quot;GuardDuty Runtime Protection Healthy&quot;,
+  }
+    at Object.toMatchObject (/Users/steve/development/cevo/aws-to-slack/test/parsers/_parser_mock.js:150:35)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)</failure>
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser.parse() is called" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser is selected by Lambda handler" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="matches event with detail" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser.parse() is called" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="parser is selected by Lambda handler" time="0.026">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-runtime" name="matches event with detail" time="0.014">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/guardduty.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="4.05" tests="25">
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser exists" time="0.134">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser.parse() is called" time="0.26">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser will match event" time="0.022">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="parser is selected by Lambda handler" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-findings" name="matches event with detail" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser.parse() is called" time="0.025">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="matches event with detail" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser.parse() is called" time="0.046">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser will match event" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser is selected by Lambda handler" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="matches event with detail" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser exists" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser.parse() is called" time="0.006">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser will match event" time="0.007">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser is selected by Lambda handler" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="matches event with detail" time="0.001">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser exists" time="0">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser.parse() is called" time="0.003">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser will match event" time="0.002">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="parser is selected by Lambda handler" time="0.072">
+    </testcase>
+    <testcase classname="Parser-Mock: guardduty-apicall" name="matches event with detail" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="test/parsers/codecommit.repository.test.js" errors="0" failures="0" skipped="0" timestamp="2024-06-04T10:55:56" time="5.423" tests="4">
+    <testcase classname="Parser-Mock: codecommit/repository" name="parser exists" time="0.085">
+    </testcase>
+    <testcase classname="Parser-Mock: codecommit/repository" name="parser.parse() is called" time="0.636">
+    </testcase>
+    <testcase classname="Parser-Mock: codecommit/repository" name="parser will match event" time="0.557">
+    </testcase>
+    <testcase classname="Parser-Mock: codecommit/repository" name="parser is selected by Lambda handler" time="0.874">
+    </testcase>
+  </testsuite>
+</testsuites>

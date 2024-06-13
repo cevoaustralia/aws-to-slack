@@ -20,7 +20,7 @@ const _ = require("lodash")
 		"codepipeline-approval",
 		"guardduty-apicall",
 		"guardduty-findings",
-		"guardduty-kuberuntime",
+		"guardduty-runtime",
 		"securityhub",
 		"inspector",
 		"rds",

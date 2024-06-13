@@ -97,6 +97,33 @@ exports.parse = event => {
 			short: true
 		});
 	}
+	else if (resourceType === "ECS") {
+		const ecsClusterDetails = _.get(resource, "ecsClusterDetails");
+		const clusterName = _.get(ecsClusterDetails, "clusterName");
+		const fargateDetails= _.get(ecsClusterDetails, "fargateDetails");
+		const issues= _.get(fargateDetails, "issues");
+		const managementType= _.get(fargateDetails, "managementType");
+
+		fields.push({
+			title: "Cluster Name",
+			value: clusterName,
+			short: true
+		});
+
+		for (const issue of issues) {
+			fields.push({
+				title: "Issue",
+				value: issue,
+				short: false
+			});
+		}
+
+		fields.push({
+			title: "Management Type",
+			value: managementType,
+			short: true
+		});
+	}
 	else {
 		console.log(`Unknown GuardDuty resourceType '${resourceType}'`);
 

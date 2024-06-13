@@ -7,7 +7,7 @@
     "node": ">=10.16.3"
   },
   "scripts": {
-    "test": "jest test",
+    "test": "jest --ci --reporters=default --reporters=jest-junit",
     "watch": "jest test --watch",
     "lint": "eslint . --ext .jsx --ext .js || exit 0"
   },
@@ -18,8 +18,9 @@
     "url": "https://github.com/arabold/aws-to-slack.git"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
     "aws-sdk": "^2.463.0",
+    "jest-junit": "^16.0.0",
+    "lodash": "^4.17.21",
     "test": "^3.3.0"
   },
   "devDependencies": {
@@ -28,5 +29,10 @@
     "eslint-plugin-lodash": "^2.7.0",
     "eslint-plugin-promise": "^4.1.1",
     "jest": "^29.3.1"
+  },
+  "jest-junit": {
+    "suiteNameTemplate": "{filepath}",
+    "classNameTemplate": "{classname}",
+    "titleTemplate": "{title}"
   }
 }

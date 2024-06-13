@@ -15,43 +15,113 @@ exports.parse = event => {
 	const accountId = _.get(detail, "recipientAccountId");
 	const region = _.get(detail, "awsRegion");
 
-	let title = "Findings Archived";
-	let description = `Findings Archived by ${actionedBy}`;
+	let title = "GuardDuty Configuration change";
+	let description = `Actioned by ${actionedBy}`;
 	let color = event.COLORS.ok;
 
-	if (eventName === "UnarchiveFindings") {
-		title = "Findings Unarchived";
-		description = `Findings Unarchived by ${actionedBy}`;
-		color = event.COLORS.warning;
-	}
+	if (eventName === "ArchiveFindings" || eventName === "UnarchiveFindings") {
 
-	fields.push({
-		title: "Account",
-		value: accountId,
-		short: true
-	});
+		title = "Findings Archived";
+		description = `Findings Archived by ${actionedBy}`;
+		color = event.COLORS.ok;
 
-	fields.push({
-		title: "Region",
-		value: region,
-		short: true
-	});
+		if (eventName === "UnarchiveFindings") {
+			title = "Findings Unarchived";
+			description = `Findings Unarchived by ${actionedBy}`;
+			color = event.COLORS.warning;
+		}
 
-	fields.push({
-		title: "Actioned by",
-		value: actionedBy,
-		short: false
-	});
-
-	const findings = _.get(detail, "requestParameters.findingIds");
-
-	for (const finding of findings) {
 		fields.push({
-			title: "Finding ID",
-			value: finding,
+			title: "Account",
+			value: accountId,
+			short: true
+		});
+
+		fields.push({
+			title: "Region",
+			value: region,
+			short: true
+		});
+
+		fields.push({
+			title: "Actioned by",
+			value: actionedBy,
 			short: false
 		});
+
+		const findings = _.get(detail, "requestParameters.findingIds");
+
+		for (const finding of findings) {
+			fields.push({
+				title: "Finding ID",
+				value: finding,
+				short: false
+			});
+		}
+	} else if (eventName === "UpdateOrganizationConfiguration" ||
+		       eventName === "UpdateDetector" ||
+			   eventName === "UpdateMemberDetectors") {
+
+
+		fields.push({
+			title: "Account",
+			value: accountId,
+			short: true
+		});
+
+		fields.push({
+			title: "Region",
+			value: region,
+			short: true
+		});
+
+		fields.push({
+			title: "Actioned by",
+			value: actionedBy,
+			short: false
+		});
+
+		fields.push({
+			title: "Event",
+			value: eventName,
+			short: true
+		});
+
+		const features = _.get(detail, "requestParameters.features");
+
+		for (const feature of features) {
+
+			fields.push({
+				title: _.get(feature, "name"),
+				value: _.get(feature, "status"),
+				short: true
+			});
+
+			const additionalConfiguration = _.get(feature, "additionalConfiguration");
+
+			if (additionalConfiguration) {
+				for (const item of additionalConfiguration) {
+					fields.push({
+						title: _.get(item, "name"),
+						value: _.get(item, "status"),
+						short: true
+					});
+				}
+			}
+		}
+
 	}
+	else {
+		console.log(`Unknown GuardDuty Event '${eventName}'`);
+
+		fields.push({
+			title: `Unknown Event Type (${eventName})`,
+			value: JSON.stringify(_.get(detail, "requestParameters"), null, 2),
+			short: false
+		});
+
+	}
+
 
 
 	return event.attachmentWithDefaults({
