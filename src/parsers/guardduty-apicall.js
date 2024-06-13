@@ -58,7 +58,10 @@ exports.parse = event => {
 				short: false
 			});
 		}
-	} else if (eventName === "UpdateOrganizationConfiguration" || eventName === "UpdateDetector") {
+	} else if (eventName === "UpdateOrganizationConfiguration" ||
+		       eventName === "UpdateDetector" ||
+			   eventName === "UpdateMemberDetectors") {
+
 
 		fields.push({
 			title: "Account",
