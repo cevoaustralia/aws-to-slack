@@ -109,11 +109,15 @@ exports.parse = event => {
 			value: clusterName,
 			short: true
 		});
-		fields.push({
-			title: "Issue",
-			value: issues,
-			short: false
-		});
+
+		for (const issue of issues) {
+			fields.push({
+				title: "Issue",
+				value: issue,
+				short: false
+			});
+		}
+
 		fields.push({
 			title: "Management Type",
 			value: managementType,

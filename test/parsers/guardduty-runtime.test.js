@@ -266,7 +266,7 @@ runtimeMock.matchesEventWithDetail(unhealthyECSEvent, {
 		{
 			"short": false,
 			"title": "Issue",
-			"value": [ "Others : Unidentified issue(s), for task(s) in TaskDefinition 'buildkite:17' . Refer documentation",],
+			"value": "Others : Unidentified issue(s), for task(s) in TaskDefinition 'buildkite:17' . Refer documentation",
 		},
 		{
 			"short": true,
