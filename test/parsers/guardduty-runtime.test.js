@@ -82,7 +82,7 @@ const healthyRuntimeProtection = {
 				"MessageId": "db0f2d8a-dabf-53a0-92de-73595e93e71b",
 				"TopicArn": "arn:aws:sns:ap-southeast-2:EXAMPLE:aws-to-slack",
 				"Subject": null,
-				"Message": "{\"version\":\"0\",\"id\":\"4eaf90cc-a2e2-06ab-1ac1-f464a1aa7412\",\"detail-type\":\"GuardDuty Runtime Protection Healthy\",\"source\":\"aws.guardduty\",\"account\":\"EXAMPLE\",\"time\":\"2024-05-31T07:53:14Z\",\"region\":\"ap-southeast-2\",\"resources\":[],\"detail\":{\"accountId\":\"CHILD-:"wEXAMPLE\",\"resourceDetails\":{\"resourceType\":\"EC2\",\"ec2InstanceDetails\":{\"instanceId\":\"i-0e5f6345341fd7144\",\"instanceType\":\"t3.medium\",\"clusterArn\":\"arn:aws:eks:ap-southeast-2:EXAMPLE:cluster/eks-demo\",\"agentDetails\":{\"version\":\"v1.6.1\"},\"managementType\":\"MANUAL\"}},\"previousStatus\":\"Unhealthy\",\"currentStatus\":\"Healthy\",\"issue\":\"\",\"lastUpdatedAt\":1717141247000}}",
+				"Message": "{\"version\":\"0\",\"id\":\"4eaf90cc-a2e2-06ab-1ac1-f464a1aa7412\",\"detail-type\":\"GuardDuty Runtime Protection Healthy\",\"source\":\"aws.guardduty\",\"account\":\"EXAMPLE\",\"time\":\"2024-05-31T07:53:14Z\",\"region\":\"ap-southeast-2\",\"resources\":[],\"detail\":{\"accountId\":\"CHILD-EXAMPLE\",\"resourceDetails\":{\"resourceType\":\"EC2\",\"ec2InstanceDetails\":{\"instanceId\":\"i-0e5f6345341fd7144\",\"instanceType\":\"t3.medium\",\"clusterArn\":\"arn:aws:eks:ap-southeast-2:EXAMPLE:cluster/eks-demo\",\"agentDetails\":{\"version\":\"v1.6.1\"},\"managementType\":\"MANUAL\"}},\"previousStatus\":\"Unhealthy\",\"currentStatus\":\"Healthy\",\"issue\":\"\",\"lastUpdatedAt\":1717141247000}}",
 				"Timestamp": "2024-05-31T07:53:16.192Z",
 				"SignatureVersion": "1",
 				"Signature": "EXAMPLE",
