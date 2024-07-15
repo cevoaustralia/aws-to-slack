@@ -11,8 +11,9 @@ exports.parse = event => {
 	const description = "";
 	const fields = [];
 	const createdAt = new Date(_.get(event, "message.time"));
-	const accountId = _.get(event, "message.account");
 	const region = _.get(event, "message.region");
+
+	const accountId = _.get(detail, "accountId");
 
 	let color = event.COLORS.ok;
 	if (_.includes(event.getDetailType(), "Unhealthy")) {
