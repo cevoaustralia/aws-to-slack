@@ -31,6 +31,8 @@ const _ = require("lodash")
 		// Last attempt to parse, will match any message:
 		"generic",
 	];
+const ChannelRouter = require("./router");
+
 
 class LambdaHandler {
 
@@ -44,6 +46,8 @@ class LambdaHandler {
 			}
 			return parser;
 		});
+
+		this.channelRouter = new ChannelRouter();
 	}
 
 	/**
@@ -142,12 +146,22 @@ class LambdaHandler {
 						Records: [ Records[i] ],
 					});
 
-					const res = await handler.processEvent(new EventDef(singleRecordEvent));
+					const singleEvent = new EventDef(singleRecordEvent);
+					const res = await handler.processEvent(singleEvent);
 					if (res) {
 						const message = res.slackMessage;
-						console.log(`SNS-Record[${i}]: Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
-						waitingTasks.push(Slack.postMessage(message));
-						waitingTasks.push(Emailer.checkAndSend(message, event));
+
+						// Lookup a channel override for this packet
+						const channels = this.channelRouter.resolveChannel(singleEvent);
+
+						for (const channel of channels) {
+							if (channel) {
+								message.channel = channel;
+							}
+							console.log(`SNS-Record[${i}]: Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+							waitingTasks.push(Slack.postMessage(message));
+							waitingTasks.push(Emailer.checkAndSend(message, event));
+						}
 					}
 					else if (handler.lastParser) {
 						console.error(`SNS-Record[${i}]: Parser[${handler.lastParser}] is force-ignoring record`);
