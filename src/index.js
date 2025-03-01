@@ -28,6 +28,7 @@ const _ = require("lodash")
 		"ses-bounce",
 		"ses-complaint",
 		"ses-received",
+		"eventbridge/aws-config",
 		// Last attempt to parse, will match any message:
 		"generic",
 	];
