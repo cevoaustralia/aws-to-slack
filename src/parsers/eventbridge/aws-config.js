@@ -2,12 +2,12 @@
 // AWS Config event parser
 //
 exports.matches = event =>
-    _.has(event.message, "configurationItem");
+    _.has(event.message, "config");
 
 exports.parse = event => {
     const accountId = event.get("accountId");
     const region = event.get("awsRegion");
-    const configItem = event.get("configurationItem");
+    const configItem = event.get("Message");
     const resourceType = configItem.resourceType;
     const resourceId = configItem.resourceId;
     const resourceName = configItem.resourceName || resourceId;
