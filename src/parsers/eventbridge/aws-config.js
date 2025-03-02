@@ -2,7 +2,7 @@
 // AWS Config event parser
 //
 exports.matches = event =>
-    _.has(event.message, "aws-config");
+    _.has(event.message, "aws.config");
 
 exports.parse = event => {
     const accountId = event.get("accountId");
