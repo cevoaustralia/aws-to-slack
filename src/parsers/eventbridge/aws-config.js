@@ -48,8 +48,8 @@ exports.matches = event =>
                                         },
                                         {
                                             type: "mrkdwn",
-                                            text: `*Compliance Status:*\n${complianceType}`,
-                                            color: `${text_color}`
+                                            text: `*Compliance Status:*\n${complianceType === 'COMPLIANT' ? 
+                                                ':green_circle: ' : ':red_circle: '}${complianceType}`                                            
                                         }
                                     ]
                                 },
