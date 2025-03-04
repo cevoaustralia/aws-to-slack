@@ -8,24 +8,20 @@ exports.matches = event =>
                 
                 // Extract the specified fields using optional chaining
                 const message = event.message;
-
-                console.log("MESSAGE IS >>>>>>>>>>>>>>>>: ", message)
-
                 configRuleName = _.get(message.detail, "configRuleName");
-                console.log("CONFIG RULE NAME : ", configRuleName)
-
-                resourceType = _.get(message, "resourceType");
+                detailType = _.get(message, "detail-type");
+                resourceType = _.get(message.detail, "resourceType");
+                resourceId = _.get(message.detail, "resourceId");
                 awsAccountId = _.get(message, "account");
                 awsRegion = _.get(message, "region");
                 complianceType = _.get(message.detail.newEvaluationResult, "complianceType");
+                configRuleInvokedTime = _.get(message.detail.newEvaluationResult, "configRuleInvokedTime");
+                resultRecordedTime = _.get(message.detail.newEvaluationResult, "resultRecordedTime");
+                const consoleLink = `https://${awsRegion}.console.aws.amazon.com/config/home?region=${awsRegion}#/rules/details?configRuleName=${configRuleName}`;
                 
-          
                 // Create Slack message with color based on compliance status
-                //const color = complianceType === 'COMPLIANT' ? '#36a64f' : '#ff0000';
                 const COLORS = require("../../eventdef").COLORS;
                 const text_color = (complianceType === 'COMPLIANT') ? COLORS.ok : COLORS.critical;
-
-                console.log("COLORS IS >>>>>>>>>>>>>>>>: ", text_color)
                 
                 const slackMessage = {
                     attachments: [
@@ -36,7 +32,7 @@ exports.matches = event =>
                                     type: "header",
                                     text: {
                                         type: "plain_text",
-                                        text: "AWS Config Rule Compliance Change"
+                                        text: `${detailType}`
                                     }
                                 },
                                 {
@@ -49,7 +45,7 @@ exports.matches = event =>
                                         {
                                             type: "mrkdwn",
                                             text: `*Compliance Status:*\n${complianceType === 'COMPLIANT' ? 
-                                                ':green_circle: ' : ':red_circle: '}${complianceType}`                                            
+                                                ':large_green_circle:' : ':red_circle:'}${complianceType}`                                            
                                         }
                                     ]
                                 },
@@ -62,7 +58,16 @@ exports.matches = event =>
                                         },
                                         {
                                             type: "mrkdwn",
+                                            text: `*ResourceId:*\n${resourceId}`
+                                        
+                                        },
+                                        {
+                                            type: "mrkdwn",
                                             text: `*Region:*\n${awsRegion}`
+                                        },
+                                        {
+                                            type: "mrkdwn",
+                                            text: `*AWS Account:*\n${awsAccountId}`
                                         }
                                     ]
                                 },
@@ -71,10 +76,29 @@ exports.matches = event =>
                                     fields: [
                                         {
                                             type: "mrkdwn",
-                                            text: `*AWS Account:*\n${awsAccountId}`
+                                            text: `*Config Rule Invoked at:*\n${configRuleInvokedTime}`
+                                        },
+                                        {   
+                                            type: "mrkdwn",
+                                            text: `*Config Rule Result Recorded at:*\n${resultRecordedTime}`
                                         }
                                     ]
-                                }
+                                },
+
+                                                                {
+                                    type: "actions",
+                                    elements: [
+                                        {
+                                            type: "button",
+                                            text: {
+                                                type: "plain_text",
+                                                text: "View in AWS Console"
+                                            },
+                                            url: `${consoleLink}`,
+                                            style: "primary"
+                                        }
+                                    ]
+                                } 
                             ]
                         }
                     ]
