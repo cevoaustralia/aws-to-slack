@@ -7,7 +7,8 @@ const _ = require("lodash")
 		"cloudwatch",
 		"codecommit/pullrequest",
 		"codecommit/repository",
-		"eventbridge/aws-config",		
+		"eventbridge/aws-config",
+		"eventbridge/aws-config-reevaluation",
 		"autoscaling",
 		"aws-health",
 		"batch-events",
@@ -132,7 +133,7 @@ class LambdaHandler {
 		try {
 			const handler = new LambdaHandler();
 			const waitingTasks = [];
-
+			
 			// Handle SNS payloads with >1 messages differently!
 			// To keep parsers as simple as possible, merge event into single-Record messages.
 			const Records = _.get(event, "Records");
