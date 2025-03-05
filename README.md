@@ -46,6 +46,11 @@ Supported AWS product notification formats:
 
 Additional formats will be added. Pull Requests are welcome!
 
+## Deployment Pre-requisites.
+1. Slack incoming webhook configured to forward incoming messages to Slack channel.
+2. A Slack Channel which receives notifications from Step 1.
+3. An SNS Topic which is sources of messages which are processed by Lambda Function.
+  
 ## Try!
 Ready to try the latest version for yourself? Installation into your own AWS environment is simple:
 
