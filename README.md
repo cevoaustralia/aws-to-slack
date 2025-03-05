@@ -35,6 +35,7 @@ Supported AWS product notification formats:
 * CodePipeline 🆕 _(via SNS/CloudWatch)_
 * CodePipeline Manual Approval 🆕
 * Elastic Beanstalk
+* Event-bridge (AWS Config Compliance Change, Remediation Execution Status Change, Remediation Execution Failures) 🆕
 * GuardDuty 🆕
 * Health Dashboard
 * Inspector
