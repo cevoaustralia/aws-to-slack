@@ -1,0 +1,128 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template for EventBridge Events and associated Role to send to SNS When AWS Config Compliance Changes or Remediation Actions Fail
+
+Parameters:
+  DeployAWSConfigComplianceChangesRule:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Set to 'true' if you wish to deploy DetectAWSConfigComplianceChanges Rule to detect Compliance Changes
+
+  DeployAWSConfigRemediationFailuresRule:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Set to 'true' if you wish to deploy DetectConfigRemediationFailures Rule to detect Failures of Remediation Actions.
+
+  ManagementAccountId:
+    Type: String
+    Description: The Account ID of Management or Audit Account where Lambda Function that subscribes to SNS Topic ConfigRemediationTopic is deployed  
+    MinLength: 12
+    MaxLength: 12
+    AllowedPattern: '^[0-9]{12}$'
+    ConstraintDescription: Management Account ID must be a 12-digit AWS account number
+
+Conditions:
+  ShouldDeployAWSConfigComplianceChangesRule: !Equals [!Ref DeployAWSConfigComplianceChangesRule, 'true']
+  ShouldDeployAWSConfigRemediationFailuresRule: !Equals [!Ref DeployAWSConfigRemediationFailuresRule, 'true']
+  
+Resources:
+  EventbridgeAllowPublishToSNS:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EventbridgeAllowPublishToSNS
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      MaxSessionDuration: 3600
+      Tags: []
+      Policies:
+        - PolicyName: allow-publish-to-sns
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource:
+                - !Ref ConfigRemediationTopic
+
+  DetectAWSConfigComplianceChanges:
+    Type: AWS::Events::Rule
+    Condition: ShouldDeployAWSConfigComplianceChangesRule
+    Properties:
+      Name: DetectAWSConfigComplianceChanges
+      EventPattern: >-
+        {"source":["aws.config"],"detail-type":["Config Rules Compliance
+        Change"]}
+      State: ENABLED
+      Description: Rule to Detect AWS Config Compliance Changes
+      EventBusName: default
+      Targets:
+        - Id: Idb2572933-c5d1-48ea-9c44-80e7257e534a
+          Arn: !Ref ConfigRemediationTopic
+          RoleArn: !GetAtt EventbridgeAllowPublishToSNS.Arn
+
+  DetectConfigRemediationFailures:
+    Type: AWS::Events::Rule
+    Condition: ShouldDeployAWSConfigRemediationFailuresRule
+    Properties:
+      Name: DetectConfigRemediationFailures
+      Description: "Detect when AWS Config remediation actions fail"
+      State: ENABLED
+      EventPattern:
+        source:
+          - "aws.config"
+        detail-type:
+          - "Config Rules Re-evaluation Status"
+          - "Config Remediation Execution Status"
+        detail:
+          status:
+            - "FAILED"
+            - "ERROR"
+      Targets:
+        - Id: NotifyConfigRemediationFailures
+          Arn: !Ref ConfigRemediationTopic
+          RoleArn: !GetAtt EventbridgeAllowPublishToSNS.Arn
+
+  ConfigRemediationTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      TopicName: 'aws-config-remediation-notifications'
+      
+  ConfigRemediationTopicPolicy:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAWSServicesToPublish
+            Effect: Allow
+            Principal:
+              Service: 
+                - config.amazonaws.com
+                - events.amazonaws.com
+            Action: 'sns:Publish'
+            Resource: !Ref ConfigRemediationTopic
+
+          - Sid: AllowManagementAccountToSubscribe
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${ManagementAccountId}:root'
+            Action:
+              - sns:Subscribe
+            Resource: !Ref ConfigRemediationTopic
+
+      Topics:
+        - !Ref ConfigRemediationTopic
+
+Outputs:
+  TopicArn:
+    Description: 'ARN of the SNS topic'
+    Value: !Ref ConfigRemediationTopic
