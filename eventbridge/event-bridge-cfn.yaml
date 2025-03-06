@@ -22,6 +22,12 @@ Parameters:
     AllowedPattern: '^[0-9]{12}$'
     ConstraintDescription: Management Account ID must be a 12-digit AWS account number
 
+  ConfigRemediationTopicName:
+    Type: String
+    Description: (Mandatory) The name of SNS Topic that will receive Events from Eventbridge and Pass to Lambda
+    AllowedPattern: '[a-zA-Z]+'
+    
+
 Conditions:
   ShouldDeployAWSConfigComplianceChangesRule: !Equals [!Ref DeployAWSConfigComplianceChangesRule, 'true']
   ShouldDeployAWSConfigRemediationFailuresRule: !Equals [!Ref DeployAWSConfigRemediationFailuresRule, 'true']
@@ -91,7 +97,7 @@ Resources:
   ConfigRemediationTopic:
     Type: 'AWS::SNS::Topic'
     Properties:
-      TopicName: 'aws-config-remediation-notifications'
+      TopicName: !Ref ConfigRemediationTopicName
       
   ConfigRemediationTopicPolicy:
     Type: 'AWS::SNS::TopicPolicy'
