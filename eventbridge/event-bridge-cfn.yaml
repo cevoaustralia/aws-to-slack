@@ -1,4 +1,3 @@
-
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template for EventBridge Events and associated Role to send to SNS When AWS Config Compliance Changes or Remediation Actions Fail
 
@@ -31,8 +30,6 @@ Resources:
   EventbridgeAllowPublishToSNS:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: EventbridgeAllowPublishToSNS
-      Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
