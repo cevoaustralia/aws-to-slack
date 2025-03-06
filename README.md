@@ -49,8 +49,17 @@ Additional formats will be added. Pull Requests are welcome!
 ## Deployment Pre-requisites.
 1. Slack incoming webhook configured to forward incoming messages to Slack channel.
 2. A Slack Channel which receives notifications from Step 1.
-3. An SNS Topic which is sources of messages which are processed by Lambda Function.
-  
+
+
+##Creating and Configuring Slack App
+1. Go to : https://api.slack.com/apps/, sign into your workspace and Click "Create New App". 
+2. Click Create App from Scratch or from Manifest. This document guides you how to create from scratch.
+3. Pick App Name and select Workspace as home to your app. Then Click Create App.  
+   Note: Your workspace may require apps to be approved by admins. Once you have created your App, request approval from your workspace admin to install it to your workspace. 
+4. Once your app is created and approved, configure the Security settings. Also create incoming webhook, and specify Slack channel where incoming messages to the webhook are forwarded. You can use an exising channel or create a new one (recommended).
+
+
+
 ## Try!
 Ready to try the latest version for yourself? Installation into your own AWS environment is simple:
 
