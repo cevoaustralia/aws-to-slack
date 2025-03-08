@@ -2,11 +2,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template for EventBridge Events and associated Role to send to SNS When AWS Config Compliance Changes or Remediation Actions Fail
 
 Parameters:
-  DeployAWSConfigComplianceChangesRule:
+  DeployAllWSConfigComplianceChangesRule:
     Type: String
     Default: 'true'
     AllowedValues: ['true', 'false']
-    Description: Set to 'true' if you wish to deploy DetectAWSConfigComplianceChanges Rule to detect Compliance Changes
+    Description: Set to 'true' if you wish to deploy ALL DetectAllAWSConfigComplianceChanges Rule to detect ALL Compliance Changes (Complaint  Non-Compliant)
 
   DeployAWSConfigRemediationFailuresRule:
     Type: String
@@ -56,11 +56,11 @@ Resources:
               Resource:
                 - !Ref ConfigRemediationTopic
 
-  DetectAWSConfigComplianceChanges:
+  DetectAllAWSConfigComplianceChanges:
     Type: AWS::Events::Rule
     Condition: ShouldDeployAWSConfigComplianceChangesRule
     Properties:
-      Name: DetectAWSConfigComplianceChanges
+      Name: DetectAllAWSConfigComplianceChanges
       EventPattern: >-
         {"source":["aws.config"],"detail-type":["Config Rules Compliance
         Change"]}
