@@ -29,7 +29,7 @@ Parameters:
     
 
 Conditions:
-  ShouldDeployAWSConfigComplianceChangesRule: !Equals [!Ref DeployAWSConfigComplianceChangesRule, 'true']
+  ShouldDetectAllAWSConfigComplianceChanges: !Equals [!Ref DetectAllAWSConfigComplianceChanges, 'true']
   ShouldDeployAWSConfigRemediationFailuresRule: !Equals [!Ref DeployAWSConfigRemediationFailuresRule, 'true']
   
 Resources:
@@ -58,7 +58,7 @@ Resources:
 
   DetectAllAWSConfigComplianceChanges:
     Type: AWS::Events::Rule
-    Condition: ShouldDeployAWSConfigComplianceChangesRule
+    Condition: ShouldDetectAllAWSConfigComplianceChanges
     Properties:
       Name: DetectAllAWSConfigComplianceChanges
       EventPattern: >-
