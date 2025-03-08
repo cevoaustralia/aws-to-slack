@@ -8,6 +8,12 @@ Parameters:
     AllowedValues: ['true', 'false']
     Description: Set to 'true' if you wish to deploy ALL DetectAllAWSConfigComplianceChanges Rule to detect ALL Compliance Changes (Complaint  Non-Compliant)
 
+  DeployAWSConfigNonComplianceAlertRule:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Set to 'true' if you wish to deploy ALL DetectAllAWSConfigComplianceChanges Rule to detect ALL Compliance Changes (Complaint  Non-Compliant)
+
   DeployAWSConfigRemediationFailuresRule:
     Type: String
     Default: 'true'
@@ -29,7 +35,8 @@ Parameters:
     
 
 Conditions:
-  ShouldDetectAllAWSConfigComplianceChanges: !Equals [!Ref DetectAllAWSConfigComplianceChanges, 'true']
+  ShouldDetectAllAWSConfigComplianceChanges: !Equals [!Ref DeployAllWSConfigComplianceChangesRule, 'true']
+  ShouldDetectAWSConfigNonCompliance: !Equals [!Ref DeployAWSConfigNonComplianceAlertRule, 'true']
   ShouldDeployAWSConfigRemediationFailuresRule: !Equals [!Ref DeployAWSConfigRemediationFailuresRule, 'true']
   
 Resources:
@@ -64,6 +71,21 @@ Resources:
       EventPattern: >-
         {"source":["aws.config"],"detail-type":["Config Rules Compliance
         Change"]}
+      State: ENABLED
+      Description: Rule to Detect AWS Config Compliance Changes
+      EventBusName: default
+      Targets:
+        - Id: Idb2572933-c5d1-48ea-9c44-80e7257e534a
+          Arn: !Ref ConfigRemediationTopic
+          RoleArn: !GetAtt EventbridgeAllowPublishToSNS.Arn
+
+  DetectAWSConfigNonComplianceChanges:
+    Type: AWS::Events::Rule
+    Condition: ShouldDetectAWSConfigNonCompliance
+    Properties:
+      Name: DetectAWSConfigNonComplianceChanges
+      EventPattern: >-
+        {"source":["aws.config"],"detail-type":["Config Rules Compliance Change"],"detail":{"messageType":["ComplianceChangeNotification"],"newEvaluationResult":{"complianceType":["NON_COMPLIANT"]}}}
       State: ENABLED
       Description: Rule to Detect AWS Config Compliance Changes
       EventBusName: default
