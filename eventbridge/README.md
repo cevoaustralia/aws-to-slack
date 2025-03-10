@@ -4,35 +4,29 @@
 [![license](https://img.shields.io/github/license/arabold/aws-to-slack.svg)](https://github.com/arabold/aws-to-slack/blob/master/LICENSE)
 
 
-This document is specific to Cloudformation Stacks that reside under *eventbridge* directory. This stack deploys the following components with certain parameters that are confirgurable
+This document is specific to Cloudformation Stacks that reside under *eventbridge* directory. This stack deploys the following components with certain parameters that are configurable.
 
-<table>
-   <tr>
-      <th>Eventbridge Rule: DetectAWSConfigNonComplianceChanges</th>
-      <th>Eventbridge Rule:DetectAllAWSConfigComplianceChanges</th>
-      <th>Eventbridge Rule:DetectConfigRemediationFailures</th>
-      <th>IAM Role: EventbridgeAllowPublishToSNS</th>
-      <th>ConfigRemediationTopic & ConfigRemediationTopicPOlicy</th>
-   </tr>
-   <tr>
-      <td width="50%">Placeholder test</td>
-      <td width="50%">Placeholder test</td>
-   </tr>
-</table>
+## Template Parameters
+  1. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
+  2. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
+  3. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
+  4. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
+  5. RemediationTopicName. SNS Topic.
 
 
-## Deployment Pre-requisites.
-1. Slack incoming webhook configured to forward incoming messages to Slack channel.
-2. A Slack Channel which receives notifications from Step 1.
+## Resources Created
+1. Eventbridge Rule: DetectAWSConfigNonComplianceChanges</th>
+2. Eventbridge Rule:DetectAllAWSConfigComplianceChanges</th>
+3. Eventbridge Rule:DetectConfigRemediationFailures</th>
+4. IAM Role: EventbridgeAllowPublishToSNS</th>
+5. ConfigRemediationTopic & ConfigRemediationTopicPOlicy</th>
 
 
-## Creating SNS Topic, Eventbridge Rules, and required Roles.
+
+## HOw to Deploy: 
 1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
-2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
-  i. DeployAWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect Compliance Changes. Default = true.
-  ii. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
-  iii. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
-  iv. RemediationTopicName. SNS Topic.
+2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. Specify the required, described above.
+
 
 
 ## Try!
