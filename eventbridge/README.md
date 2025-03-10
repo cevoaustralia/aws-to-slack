@@ -4,7 +4,9 @@
 [![license](https://img.shields.io/github/license/arabold/aws-to-slack.svg)](https://github.com/arabold/aws-to-slack/blob/master/LICENSE)
 
 
-This document is specific to Cloudformation Stacks that reside under *eventbridge* directory. This stack deploys the following components with certain parameters that are configurable.
+This document is specific to Cloudformation Stacks that reside under *eventbridge* directory. As of now, this stack only creates rules for AWS Config related events.
+
+This stack deploys the following components with certain parameters that are configurable.
 
 ## Template Parameters
   1. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
