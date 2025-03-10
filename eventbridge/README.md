@@ -23,17 +23,17 @@ This document is specific to Cloudformation Stacks that reside under *eventbridg
 
 
 
-## HOw to Deploy: 
+## How to Deploy: 
 1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
 2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. Specify the required, described above.
 
-
-
-## Try!
-Ready to try the latest version for yourself? Installation into your own AWS environment is simple - just launch event-bridge-cfn.yaml in Cloudformation COnsole.
+## Try in Single Account:
+Ready to try the latest version for yourself? Installation into your own AWS environment is simple - just launch event-bridge-cfn.yaml in Cloudformation Console. For that, please do not deploy as StackSet.
 
 
 ## Contributing
 
-You want to contribute? That's awesome! 🎉
-
+If you want to leverage EventBridge to receive notifications, here is what you will need to do.
+1. Update the event-bridge-cfn.yaml to add the relevant Rule.
+2. Update the scr\parsers to include the parser to parse the relevant field sent in Eventbridge message payload, for consumption of Slack API.
+3. Update the Parsers list in src\index.js to include your parser.
