@@ -61,10 +61,11 @@ Additional formats will be added. Pull Requests are welcome!
 ## Creating SNS Topic, Eventbridge Rules, and required Roles.
 1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
 2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
-  i. DeployAWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect Compliance Changes. Default = true.
-  ii. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
-  iii. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
-  iv. RemediationTopicName. SNS Topic.
+   i. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
+  ii. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
+  iii. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
+  iv. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
+  v. RemediationTopicName. SNS Topic.
 
 
 ## Try!
