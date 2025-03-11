@@ -58,6 +58,47 @@ Additional formats will be added. Pull Requests are welcome!
    Note: Your workspace may require apps to be approved by admins. Once you have created your App, request approval from your workspace admin to install it to your workspace. 
 4. Once your app is created and approved, configure the Security settings. Also create incoming webhook, and specify Slack channel where incoming messages to the webhook are forwarded. You can use an exising channel or create a new one (recommended).
 
+1. Go to : https://api.slack.com/apps/, sign into your workspace and Click "Create New App". 
+
+Open image-20250311-040211.png
+image-20250311-040211.png
+
+2. On next prompt, Click Create App from Scratch. You can also create an App from a Manifest file. This document guides you how to create from scratch. 
+
+Open image-20250311-040250.png
+image-20250311-040250.png
+
+3. Pick App Name and select Workspace as home to your app. Then Click Create App.  
+Note: Your workspace may require apps to be approved by admins. Once you have created your App, request approval from your workspace admin to install it to your workspace. 
+
+4. Once your app is created, you will be shown a Settings screen with information relevant to your newly created App. Provide name and description, and leave all other fields as they are. Click Save Changes. 
+
+Open image-20250311-041642.png
+image-20250311-041642.png
+ 
+
+5. Next you will need to configure incoming webhooks. To do that, from the Options in the left pane, under Features,   Click Incoming Webhooks and Click Activate Incoming Webhooks.
+
+
+Open image-20250311-042126.png
+image-20250311-042126.png
+Open image-20250311-042159.png
+image-20250311-042159.png
+
+6. Next you may need to get Approval to Request Incoming Webhooks.  This is required for your Application to receive messages, and relay to your designated Slack Channel. Click Request Incoming Webhooks, and request your admin for approval. 
+
+Open image-20250311-042558.png
+image-20250311-042558.png
+
+7. Once Approved, go back to Incoming Webhooks. Specify the Slack Channel where you want the Incoming messages to be Posted. 
+
+Open image-20250311-050403.png
+image-20250311-050403.png
+ 
+
+8. **The webhook contains parts of your credential information. Hence this should be considered as a sensitive information and stored accordingly. Anyone with this Webhook Url can post Messages to it.**
+
+   
 ## Creating SNS Topic, Eventbridge Rules, and required Roles.
 1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
 2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
