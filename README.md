@@ -53,48 +53,33 @@ Additional formats will be added. Pull Requests are welcome!
 
 ## Creating and Configuring Slack App
 1. Go to : https://api.slack.com/apps/, sign into your workspace and Click "Create New App". 
-2. Click Create App from Scratch or from Manifest. This document guides you how to create from scratch.
-3. Pick App Name and select Workspace as home to your app. Then Click Create App.  
-   Note: Your workspace may require apps to be approved by admins. Once you have created your App, request approval from your workspace admin to install it to your workspace. 
-4. Once your app is created and approved, configure the Security settings. Also create incoming webhook, and specify Slack channel where incoming messages to the webhook are forwarded. You can use an exising channel or create a new one (recommended).
 
-1. Go to : https://api.slack.com/apps/, sign into your workspace and Click "Create New App". 
-
-Open image-20250311-040211.png
-image-20250311-040211.png
+![image](https://github.com/user-attachments/assets/ff3e072f-f658-4539-a5f7-db0f002fb015)
 
 2. On next prompt, Click Create App from Scratch. You can also create an App from a Manifest file. This document guides you how to create from scratch. 
 
-Open image-20250311-040250.png
-image-20250311-040250.png
+![image](https://github.com/user-attachments/assets/170ab499-b93c-499a-a29d-c0fdf84d10f7)
 
 3. Pick App Name and select Workspace as home to your app. Then Click Create App.  
 Note: Your workspace may require apps to be approved by admins. Once you have created your App, request approval from your workspace admin to install it to your workspace. 
 
 4. Once your app is created, you will be shown a Settings screen with information relevant to your newly created App. Provide name and description, and leave all other fields as they are. Click Save Changes. 
 
-Open image-20250311-041642.png
-image-20250311-041642.png
- 
+![image](https://github.com/user-attachments/assets/13a0b8e3-2a3b-442d-a22e-9f7885518ae9)
 
 5. Next you will need to configure incoming webhooks. To do that, from the Options in the left pane, under Features,   Click Incoming Webhooks and Click Activate Incoming Webhooks.
 
+![image](https://github.com/user-attachments/assets/20b8cbb7-3adf-4b02-be44-02c5a8a1b634)
 
-Open image-20250311-042126.png
-image-20250311-042126.png
-Open image-20250311-042159.png
-image-20250311-042159.png
+![image](https://github.com/user-attachments/assets/1c3d2c53-244d-4e4f-8895-dbcf0cd7a5ac)
 
 6. Next you may need to get Approval to Request Incoming Webhooks.  This is required for your Application to receive messages, and relay to your designated Slack Channel. Click Request Incoming Webhooks, and request your admin for approval. 
 
-Open image-20250311-042558.png
-image-20250311-042558.png
+![image](https://github.com/user-attachments/assets/db05a6da-4459-413c-b22a-d04be117b4e5)
 
 7. Once Approved, go back to Incoming Webhooks. Specify the Slack Channel where you want the Incoming messages to be Posted. 
 
-Open image-20250311-050403.png
-image-20250311-050403.png
- 
+![image](https://github.com/user-attachments/assets/0ba9263c-6c70-4abe-b7e1-2ad34417c096)
 
 8. **The webhook contains parts of your credential information. Hence this should be considered as a sensitive information and stored accordingly. Anyone with this Webhook Url can post Messages to it.**
 
