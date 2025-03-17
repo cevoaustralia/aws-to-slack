@@ -146,20 +146,28 @@ Note: Your workspace may require apps to be approved by admins. Once you have cr
 
 3. Note the SNS topic ARN from the deployment output for use in the central account configuration
 
-### Step 3: Central Account (Audit/Management) Deployment
-1. Deploy the Lambda function in the central account:
-   ```bash
-   # Set AWS_PROFILE to your central account profile
-   export AWS_PROFILE=central-account
-   npm run deploy
-   ```
+### Step 3: Deploy main Cloudformation Stack in Central Account (Audit/Management)
+Note: Do not Deploy this as StackSet.
+1. Use AWS Console's [Create CloudFormation Stack](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=aws-to-slack) tool.
 
-2. During deployment, provide:
+   Upload [cloudformation.yaml](https://raw.githubusercontent.com/arabold/aws-to-slack/master/cloudformation.yaml) as your template.
+   
+   During deployment, provide:
    - The Slack Webhook URL obtained in Step 1
    - The desired AWS region
    - The SNS topic ARN from the member account deployment
    - KMS key details (if using encryption)
 
+2. Build / Update the Lambda Function code, and deploy in the central account  by running the following from the root of this project
+
+   ```
+   AWS_REGION="<your_lambda_region>" LAMBDA_NAME="<your_lambda_name>" make deploy
+   ```  
+
+   If you use AWS CLI profiles, simply add `AWS_PROFILE` to the make command like so:
+   ```
+   AWS_PROFILE="my-profile" AWS_REGION="<your_lambda_region>" LAMBDA_NAME="<your_lambda_name>" make deploy
+   
 ### Step 4: Event Configuration
 1. In each member account:
    - Navigate to the AWS Management Console
@@ -168,6 +176,8 @@ Note: Your workspace may require apps to be approved by admins. Once you have cr
    - Set the target as the SNS topic created during deployment
 
    
+
+## Below steps are deprecated and need to be deleted.
 
 
 ## Try!
