@@ -27,27 +27,30 @@ AWS-to-Slack is a serverless solution that enables real-time forwarding of AWS s
 - Multi-account setup support with centralized notifications
 
 ## Architecture
-The solution implements a hub-and-spoke architecture for multi-account event processing:
+The solution implements a hub-and-spoke architecture for multi-account event processing, where:
+- Member account contains the EventBridge rules and SNS Topic for collecting AWS service events
+- Central (Audit/Management) account contains the Lambda function that processes these events and forwards them to Slack
 
 ```
-┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│   Account A      │    │   Account B      │    │   Account C      │
-│  (Member)        │    │  (Member)        │    │  (Member)        │
-│                  │    │                  │    │                  │
-│  EventBridge ────┼────▶ SNS Topic    ◄───┼────  EventBridge    │
-└────────┬─────────┘    └────────┬─────────┘    └──────────────────┘
+┌──────────────────┐    ┌──────────────────┐            ┌──────────────────┐
+│   Account A      │    │   Account B      │  .......   │   Account C      │
+│  (Member)        │    │  (Member)        │            │  (Member)        │
+│                  │    │                  │            │                  │
+│ EventBridge Rule        EventBridge Rule                EventBridge Rule
+    SNS Topic               SNS Topic                        SNS Topic
+└────────┬─────────┘    └────────┬─────────┘            └──────────────────┘
          │                       │
          │                       │
          ▼                       ▼
-┌─────────────────────────────────────────────┐
-│           Central Account                    │
-│           (Audit/Management)                 │
-│                                             │
-│    ┌─────────────┐         ┌────────────┐  │
-│    │   Lambda    │         │   Slack    │  │
-│    │   Function  ├─────────▶  Channel   │  │
-│    └─────────────┘         └────────────┘  │
-└─────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────┐
+│           Central Account                                                 │
+│           (Audit/Management)                                              │  
+│                                                                           │
+│    ┌─────────────┐         ┌─────────────┐                                │
+│    │   Lambda    │         │   Slack     │                                │
+│    │   Function  ├─────────▶  Channel   |                                |
+│    └─────────────┘         └─────────────┘                                |           
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
 The solution uses the following AWS services:
@@ -75,43 +78,38 @@ The solution uses the following AWS services:
 7. Select the channel where you want to receive notifications
 8. Copy the Webhook URL for use in the AWS configuration
 
-### Step 2: Central Account (Audit/Management) Deployment
+### Step 2: Member Account Configuration
 1. Clone the repository:
    ```bash
    git clone [repository-url]
    cd aws-to-slack
    ```
 
-2. Deploy the Lambda function in the central account:
-   ```bash
-   # Set AWS_PROFILE to your central account profile
-   export AWS_PROFILE=central-account
-   npm run deploy
-   ```
-
-3. During deployment, provide:
-   - The Slack Webhook URL obtained in Step 1
-   - The desired AWS region
-   - The SNS topic name
-   - KMS key details (if using encryption)
-
-4. Note the SNS topic ARN from the deployment output
-
-### Step 3: Member Account Configuration
-1. Deploy EventBridge rules in each member account:
+2. Deploy SNS Topic and EventBridge rules in the member account:
    ```bash
    cd eventbridge
    # Set AWS_PROFILE to your member account profile
    export AWS_PROFILE=member-account
    aws cloudformation deploy \
      --template-file event-bridge-cfn.yaml \
-     --stack-name aws-to-slack-events \
-     --parameter-overrides \
-       CentralAccountId=<CENTRAL_ACCOUNT_ID> \
-       SnsTopicArn=<SNS_TOPIC_ARN>
+     --stack-name aws-to-slack-events
    ```
 
-2. Repeat for each member account where you want to collect events
+3. Note the SNS topic ARN from the deployment output for use in the central account configuration
+
+### Step 3: Central Account (Audit/Management) Deployment
+1. Deploy the Lambda function in the central account:
+   ```bash
+   # Set AWS_PROFILE to your central account profile
+   export AWS_PROFILE=central-account
+   npm run deploy
+   ```
+
+2. During deployment, provide:
+   - The Slack Webhook URL obtained in Step 1
+   - The desired AWS region
+   - The SNS topic ARN from the member account deployment
+   - KMS key details (if using encryption)
 
 ### Step 4: Event Configuration
 1. In each member account:
