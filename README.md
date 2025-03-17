@@ -135,13 +135,13 @@ Note: Your workspace may require apps to be approved by admins. Once you have cr
    ```
 
 #### Deployment as StackSet in Management / Audit Account. ( This should be delegated Admin for Org.)
-i. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
-ii. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
-   a. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
-   b. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
-   c. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
-   d. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
-   e. RemediationTopicName. SNS Topic.
+..i. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
+..ii. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
+   ..a. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
+   ..b. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
+   ..c. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
+   ..d. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
+   ..e. RemediationTopicName. SNS Topic.
 
 
 3. Note the SNS topic ARN from the deployment output for use in the central account configuration
