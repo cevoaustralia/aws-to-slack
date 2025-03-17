@@ -26,8 +26,7 @@ This stack deploys the following components with certain parameters that are con
 
 
 ## How to Deploy: 
-1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
-2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. Specify the required, described above.
+Please Refer to Step 2.2 Deploy SNS Topic and EventBridge rules in the member account in the README under root directory of the project. 
 
 ## Try in Single Account:
 Ready to try the latest version for yourself? Installation into your own AWS environment is simple - just launch event-bridge-cfn.yaml in Cloudformation Console. For that, please do not deploy as StackSet.
