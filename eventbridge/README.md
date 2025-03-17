@@ -9,9 +9,9 @@ This document is specific to Cloudformation Stacks that reside under *eventbridg
 This stack deploys the following components with certain parameters that are configurable.
 
 ## Template Parameters
-  1. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
-  2. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
-  3. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
+  1. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all AWS Config Compliance Changes. Default = true.
+  2. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant in AWS Config. Default = true. 
+  3. Controls creation of Eventbridge rule to detect Failures of AWS Config Remediation Actions. Default = true.
   4. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
   5. RemediationTopicName. SNS Topic.
 
