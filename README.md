@@ -4,8 +4,9 @@
 [![license](https://img.shields.io/github/license/arabold/aws-to-slack.svg)](https://github.com/arabold/aws-to-slack/blob/master/LICENSE)
 [![dependencies](https://img.shields.io/david/arabold/aws-to-slack.svg)](https://www.npmjs.com/package/aws-to-slack)
 
-
-Forward AWS CloudWatch Alarms and other notifications from Amazon SNS to Slack.
+## Introduction
+AWS-to-Slack is a serverless solution that enables real-time forwarding of AWS service notifications and alerts to Slack channels. It is self-hosted in your own AWS environment and doesn't have any 3rd party dependencies other than the Google Charts API for rendering CloudWatch metrics.
+It uses AWS Lambda, written in Nodejs, to process events from various AWS services and forwards them to Slack using webhooks. The lamda itself is triggered via SNS service.
 
 <table>
    <tr>
@@ -18,13 +19,8 @@ Forward AWS CloudWatch Alarms and other notifications from Amazon SNS to Slack.
    </tr>
 </table>
 
-## What is it?
-_AWS-to-Slack_ is a Lambda function written in Node.js that forwards alarms and
-notifications to a dedicated [Slack](https://slack.com) channel. It is self-hosted
-in your own AWS environment and doesn't have any 3rd party dependencies other
-than the Google Charts API for rendering CloudWatch metrics.
-
-Supported AWS product notification formats:
+## Features
+Supports multiple AWS services notification formats including:
 * Auto-Scaling Events
 * Batch Events
 * CloudFormation
@@ -46,12 +42,50 @@ Supported AWS product notification formats:
 
 Additional formats will be added. Pull Requests are welcome!
 
-## Deployment Pre-requisites.
-1. Slack incoming webhook configured to forward incoming messages to Slack channel.
-2. A Slack Channel which receives notifications from Step 1.
+## Architecture
+The solution implements a hub-and-spoke architecture for multi-account event processing, where:
+- Member account contains the Event Sources and SNS Topic for collecting AWS service events
+- Central (Audit/Management) account contains the Lambda function that processes these events and forwards them to Slack.
+
+```
+┌──────────────────┐    ┌──────────────────┐            ┌──────────────────┐
+│   Account A      │    │   Account B      │  .......   │   Account N      │
+│  (Member)        │    │  (Member)        │            │  (Member)        │
+│                  │    │                  │            │                  │
+│   Event Source            Event Source                     Event Source
+    SNS Topic               SNS Topic                        SNS Topic
+└────────┬─────────┘    └────────┬─────────┘            └─────────┬────────┘
+         │                       │                                │
+         │                       │                                │
+         ▼                       ▼                                ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│           Central Account                                                 │
+│           (Audit/Management)                                              │  
+│                                                                           │
+│    ┌─────────────┐         ┌─────────────┐                                │
+│    │   Lambda    │         │   Slack     │                                │
+│    │   Function  ├─────────▶  Channel   |                                |
+│    └─────────────┘         └─────────────┘                                |           
+└───────────────────────────────────────────────────────────────────────────┘
+```
+
+The solution uses the following AWS services:
+- AWS Lambda - For event processing and Slack message formatting
+- Event Source, i.e. Cloudwatch, EventBridge or supported AWS Services as described in features above - For routing AWS service events
+- Amazon SNS - For cross-account message delivery
+- IAM - For security and access control
+- CloudFormation - For infrastructure deployment
+
+## Deployment Guide
+
+## Pre-requisites.
+1. Access to multiple AWS accounts (member accounts and central account)
+2. A Slack workspace where you have permissions to create apps
+3. Node.js and npm (for development)
+4. AWS CLI (for deployment)
 
 
-## Creating and Configuring Slack App
+### Slack Configuration
 1. Go to : https://api.slack.com/apps/, sign into your workspace and Click "Create New App". 
 
 ![image](https://github.com/user-attachments/assets/ff3e072f-f658-4539-a5f7-db0f002fb015)
