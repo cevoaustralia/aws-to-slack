@@ -85,7 +85,7 @@ The solution uses the following AWS services:
 4. AWS CLI (for deployment)
 
 
-### Slack Configuration
+### Step 1: Slack Configuration
 1. Go to : https://api.slack.com/apps/, sign into your workspace and Click "Create New App". 
 
 ![image](https://github.com/user-attachments/assets/ff3e072f-f658-4539-a5f7-db0f002fb015)
@@ -117,15 +117,57 @@ Note: Your workspace may require apps to be approved by admins. Once you have cr
 
 8. **The webhook contains parts of your credential information. Hence this should be considered as a sensitive information and stored accordingly. Anyone with this Webhook Url can post Messages to it.**
 
-   
-## Creating SNS Topic, Eventbridge Rules, and required Roles.
-1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
-2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
+### Step 2: Member Account Configuration
+1. Clone the repository:
+   ```bash
+   git clone [repository-url] #https://github.com/cevoaustralia/aws-to-slack/
+   cd aws-to-slack
+   ```
+
+2. Deploy SNS Topic and EventBridge rules in the member account: (Or deploy as StackSet from Management Account, see below on how to do it.)
+   ```bash
+   cd eventbridge
+   # Set AWS_PROFILE to your member account profile
+   export AWS_PROFILE=member-account
+   aws cloudformation deploy \
+     --template-file event-bridge-cfn.yaml \
+     --stack-name aws-to-slack-events
+   ```
+
+   #### Deployment as StackSet in Management / Audit Account. ( This should be delegated Admin for Org.)
+   Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
+   Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
    i. DeployAllWSConfigComplianceChangesRule (Boolean). Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
   ii. DeployAWSConfigNonComplianceAlertRule: Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
   iii. Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
   iv. ManagementAccountId. Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
   v. RemediationTopicName. SNS Topic.
+
+
+3. Note the SNS topic ARN from the deployment output for use in the central account configuration
+
+### Step 3: Central Account (Audit/Management) Deployment
+1. Deploy the Lambda function in the central account:
+   ```bash
+   # Set AWS_PROFILE to your central account profile
+   export AWS_PROFILE=central-account
+   npm run deploy
+   ```
+
+2. During deployment, provide:
+   - The Slack Webhook URL obtained in Step 1
+   - The desired AWS region
+   - The SNS topic ARN from the member account deployment
+   - KMS key details (if using encryption)
+
+### Step 4: Event Configuration
+1. In each member account:
+   - Navigate to the AWS Management Console
+   - Go to EventBridge (CloudWatch Events)
+   - Create rules for the AWS services you want to monitor
+   - Set the target as the SNS topic created during deployment
+
+   
 
 
 ## Try!
