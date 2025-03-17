@@ -135,12 +135,18 @@ Note: Your workspace may require apps to be approved by admins. Once you have cr
    ```
 
 #### Deployment as StackSet in Management / Audit Account. ( This should be delegated Admin for Org.)
+**NOTE: THIS IS ONLY APPLICABLE FOR SETTING UP AWS CONFIG COMPLIANCE NOTIFICATIONS**
 1. Go to your Management/Audit/Security AWS account from where you wish to deploy the SNS Topic, Eventbridge Rules and required IAM role.
 2. Grab the Cloudformation template under eventbridge directory, and deploy it as StackSet. This template requires parameters below:
 
-- **DeployAllWSConfigComplianceChangesRule (Boolean)**. Controls creation of Eventbridge rule to detect all Compliance Changes. Default = true.
-- **DeployAWSConfigNonComplianceAlertRule:** Controls creation of Eventbridge rule to only when resources become non-Compliant. Default = true. 
-- **DeployAWSConfigRemediationFailuresRule:** Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
+- **DeployAllWSConfigComplianceChangesRule (Boolean)**. Controls creation of Eventbridge rule to detect all AWS Config Compliance Changes. Default = true.
+- **DeployAWSConfigNonComplianceAlertRule:(Boolean)** Controls creation of Eventbridge rule to detect only when resources become non-Compliant in AWS Config. Default = true. 
+
+**NOTE: WHEN DeployAllWSConfigComplianceChangesRule  is True, the Option DeployAWSConfigNonComplianceAlertRule Should be SET False to avoid duplication of non Complaint resource notifications.**
+
+**NOTE: WHEN you need to be notified for only AWS Config non-Complaince, set DeployAWSConfigNonComplianceAlertRule = True AND set DeployAllWSConfigComplianceChangesRule = False.**
+
+- **DeployAWSConfigRemediationFailuresRule:(Boolean)** Controls creation of Eventbridge rule to detect Failures of Remediation Actions. Default = true.
 - **ManagementAccountId:** Mandatory Parameter for AWS Account ID where you manage the StackSet. The Lambda Function that Subscribes to the SNS topic is also created in this account. Steps to deploy lambda are described in next Section.
 - **RemediationTopicName:** SNS Topic.
 
