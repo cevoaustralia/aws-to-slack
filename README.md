@@ -115,6 +115,20 @@ different channel to post to if wanted.
 Click "Next" again, complete the stack setup on the following pages and
 finally launch your stack.
 
+**ALTERNATIVELY: Use Makefile for Deployment**
+
+The Makefile found in this repository assists with the deployment of the tool. This can be used in place of the steps directly above to deploy the tool. To do this perform the following steps:
+
+1. Create a `.env` file that includes the following as a minumum:
+   ```
+   STACK_NAME=aws-to-slack
+   STACK_PARAMS="ParameterKey=HookUrl,ParameterValue=<https://hooks.slack.com/services/<YOUR_SLACK_WEBHOOK>>"
+   ```
+2. Configure your AWS Credentials via CLI
+3. Use the `make create-stack TARGET=.env` command to create the Cloudformation stack
+4. Use the `make load-lambda-name TARGET=.env` command to add the Lambda function name to the `.env` file
+5. Use the `make deploy TARGET=.env` command to update the Lambda function with the code in the current directory
+
 ### Step 3: Subscribe to Triggers
 
 Before the Lambda function will actually do anything you need to subscribe it
