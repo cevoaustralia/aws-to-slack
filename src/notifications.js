@@ -3,13 +3,13 @@ const url = require("url")
 	, AWS = require("aws-sdk")
 	, _ = require("lodash");
 
-/** The Slack hook URL */
+/** The webhook URL (Slack or Teams) */
 const hookUrlPromise = shouldDecryptBlob(process.env.SLACK_HOOK_URL, s =>
 	// URL should be 78-80 characters long when decrypted
 	s.length > 100 && !/https?:\/\/\w/.test(s));
 
-/** The Slack channel to send a message to stored in the slackChannel environment variable */
-const slackChannelPromise = shouldDecryptBlob(process.env.SLACK_CHANNEL);
+/** The channel to send a message to (Slack only) */
+const channelPromise = shouldDecryptBlob(process.env.SLACK_CHANNEL);
 
 /**
  * Decrypt environment variable if it looks like a KMS encrypted string.
@@ -44,11 +44,11 @@ function shouldDecryptBlob(blob, isValid) {
 }
 
 /**
- * Slack Helper Utility
+ * Notification Helper Utility (Slack & Teams)
  */
-class Slack {
+class Notifications {
 	/**
-	 * Converts a given {@link Date} object to a Slack-compatible epoch timestamp.
+	 * Converts a given {@link Date} object to an epoch timestamp.
 	 *
 	 * @param {Date} date - Date object to convert
 	 * @returns {Integer} Epoch time
@@ -58,20 +58,24 @@ class Slack {
 	}
 
 	/**
-	 * Posts a message to Slack.
+	 * Posts a message to Slack or Teams.
 	 *
-	 * @param {Object} message - Message to post to Slack
+	 * @param {Object} message - Message to post to Slack or Teams
 	 * @returns {Promise} Fulfills on success, rejects on error.
 	 */
 	static postMessage(message) {
 		return retry(3, async () => {
 			const hookUrl = await hookUrlPromise;
-			const slackChannel = await slackChannelPromise;
-			if (_.isEmpty(message.channel) && !_.isEmpty(slackChannel)) {
-				message.channel = slackChannel;
+			const channel = await channelPromise;
+			if (_.isEmpty(message.channel) && !_.isEmpty(channel)) {
+				message.channel = channel;
 			}
 
-			const response = await postJson(message, hookUrl);
+			// Check if this is a Teams webhook and convert message format
+			const isTeamsWebhook = hookUrl.includes('office.com') || hookUrl.includes('outlook.com') || hookUrl.includes('azure.com');
+			const payload = isTeamsWebhook ? this.convertToTeamsFormat(message) : message;
+
+			const response = await postJson(payload, hookUrl);
 			const statusCode = response.statusCode;
 
 			if (200 <= statusCode && statusCode < 300) {
@@ -79,20 +83,89 @@ class Slack {
 				return response;
 			}
 			if (400 <= statusCode && statusCode < 500) {
-				const e = new Error(`Slack API reports bad request [HTTP:${response.statusCode}] ${response.statusMessage}: ${response.body}`);
+				const e = new Error(`Webhook API reports bad request [HTTP:${response.statusCode}] ${response.statusMessage}: ${response.body}`);
 				e.retryable = false;
 				throw e;
 			}
 
-			throw `Slack API error [HTTP:${response.statusCode}]: ${response.body}`;
+			throw `Webhook API error [HTTP:${response.statusCode}]: ${response.body}`;
 		});
+	}
+
+	/**
+	 * Converts message format to Teams format.
+	 *
+	 * @param {Object} message - Standard message format
+	 * @returns {Object} Teams formatted message
+	 */
+	static convertToTeamsFormat(message) {
+		// Keep attachments array structure for Power Automate compatibility
+		return {
+			attachments: message.attachments?.map(attachment => ({
+				contentType: "application/vnd.microsoft.card.adaptive",
+				content: {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					type: "AdaptiveCard",
+					version: "1.2",
+					body: [
+						{
+							type: "TextBlock",
+							text: attachment.author_name || "AWS Notification",
+							weight: "Bolder",
+							size: "Medium"
+						},
+						{
+							type: "TextBlock",
+							text: attachment.title || "",
+							weight: "Bolder"
+						},
+						{
+							type: "TextBlock",
+							text: attachment.text || "",
+							wrap: true
+						},
+						...(attachment.fields?.map(field => ({
+							type: "FactSet",
+							facts: [{
+								title: field.title,
+								value: field.value
+							}]
+						})) || [])
+					],
+					...(attachment.title_link && {
+						actions: [{
+							type: "Action.OpenUrl",
+							title: "View in AWS Console",
+							url: attachment.title_link
+						}]
+					})
+				}
+			})) || []
+		};
+	}
+
+	/**
+	 * Maps color names to hex values for Teams.
+	 *
+	 * @param {string} color - Color name or hex
+	 * @returns {string} Hex color value
+	 */
+	static mapColorToHex(color) {
+		const colorMap = {
+			danger: "FF324D",
+			warning: "FFD602",
+			good: "8CC800",
+			"#1E90FF": "1E90FF",
+			"#A8A8A8": "A8A8A8"
+		};
+		return colorMap[color] || color?.replace('#', '') || "1E90FF";
 	}
 }
 
 /**
  * Set of predefined colors for different alert levels
  */
-Slack.COLORS = {
+Notifications.COLORS = {
 	critical: "danger",  // "#FF324D",
 	warning: "warning", // "#FFD602",
 	ok: "good",    // "#8CC800",
@@ -175,4 +248,4 @@ function postJson(data, endpoint) {
 	});
 }
 
-module.exports = Slack;
+module.exports = Notifications;

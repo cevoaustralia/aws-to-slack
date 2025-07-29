@@ -1,6 +1,6 @@
 const _ = require("lodash")
 	, EventDef = require("./eventdef")
-	, Slack = require("./slack")
+	, Notifications = require("./notifications")
 	, Emailer = require("./ses")
 	, defaultParserWaterfall = [
 		// Ordered list of parsers:
@@ -147,8 +147,8 @@ class LambdaHandler {
 					const res = await handler.processEvent(new EventDef(singleRecordEvent));
 					if (res) {
 						const message = res.slackMessage;
-						console.log(`SNS-Record[${i}]: Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
-						waitingTasks.push(Slack.postMessage(message));
+						console.log(`SNS-Record[${i}]: Sending notification from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+						waitingTasks.push(Notifications.postMessage(message));
 						waitingTasks.push(Emailer.checkAndSend(message, event));
 					}
 					else if (handler.lastParser) {
@@ -163,8 +163,8 @@ class LambdaHandler {
 				const res = await handler.processEvent(new EventDef(event));
 				if (res) {
 					const message = res.slackMessage;
-					console.log(`Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
-					waitingTasks.push(Slack.postMessage(message));
+					console.log(`Sending notification from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+					waitingTasks.push(Notifications.postMessage(message));
 					waitingTasks.push(Emailer.checkAndSend(message, event));
 				}
 				else if (handler.lastParser) {
