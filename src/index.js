@@ -1,12 +1,14 @@
 const _ = require("lodash")
 	, EventDef = require("./eventdef")
-	, Slack = require("./slack")
+	, Notifications = require("./notifications")
 	, Emailer = require("./ses")
 	, defaultParserWaterfall = [
 		// Ordered list of parsers:
 		"cloudwatch",
 		"codecommit/pullrequest",
 		"codecommit/repository",
+		"eventbridge/aws-config",
+		"eventbridge/aws-config-reevaluation",
 		"autoscaling",
 		"aws-health",
 		"batch-events",
@@ -131,7 +133,7 @@ class LambdaHandler {
 		try {
 			const handler = new LambdaHandler();
 			const waitingTasks = [];
-
+			
 			// Handle SNS payloads with >1 messages differently!
 			// To keep parsers as simple as possible, merge event into single-Record messages.
 			const Records = _.get(event, "Records");
@@ -145,8 +147,8 @@ class LambdaHandler {
 					const res = await handler.processEvent(new EventDef(singleRecordEvent));
 					if (res) {
 						const message = res.slackMessage;
-						console.log(`SNS-Record[${i}]: Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
-						waitingTasks.push(Slack.postMessage(message));
+						console.log(`SNS-Record[${i}]: Sending notification from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+						waitingTasks.push(Notifications.postMessage(message));
 						waitingTasks.push(Emailer.checkAndSend(message, event));
 					}
 					else if (handler.lastParser) {
@@ -161,8 +163,8 @@ class LambdaHandler {
 				const res = await handler.processEvent(new EventDef(event));
 				if (res) {
 					const message = res.slackMessage;
-					console.log(`Sending Slack message from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
-					waitingTasks.push(Slack.postMessage(message));
+					console.log(`Sending notification from Parser[${res.parserName}]:`, JSON.stringify(message, null, 2));
+					waitingTasks.push(Notifications.postMessage(message));
 					waitingTasks.push(Emailer.checkAndSend(message, event));
 				}
 				else if (handler.lastParser) {
