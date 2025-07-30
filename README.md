@@ -1,11 +1,11 @@
-# AWS-to-Slack
+# AWS Notifications
 
 [![npm](https://img.shields.io/npm/v/aws-to-slack.svg)](https://www.npmjs.com/package/aws-to-slack)
 [![license](https://img.shields.io/github/license/arabold/aws-to-slack.svg)](https://github.com/arabold/aws-to-slack/blob/master/LICENSE)
 [![dependencies](https://img.shields.io/david/arabold/aws-to-slack.svg)](https://www.npmjs.com/package/aws-to-slack)
 
 
-Forward AWS CloudWatch Alarms and other notifications from Amazon SNS to Slack.
+Forward AWS CloudWatch Alarms and other notifications from Amazon SNS to Slack or Microsoft Teams.
 
 <table>
    <tr>
@@ -19,10 +19,14 @@ Forward AWS CloudWatch Alarms and other notifications from Amazon SNS to Slack.
 </table>
 
 ## What is it?
-_AWS-to-Slack_ is a Lambda function written in Node.js that forwards alarms and
-notifications to a dedicated [Slack](https://slack.com) channel. It is self-hosted
+_AWS Notifications_ is a Lambda function written in Node.js that forwards alarms and
+notifications to [Slack](https://slack.com) or [Microsoft Teams](https://teams.microsoft.com) channels. It is self-hosted
 in your own AWS environment and doesn't have any 3rd party dependencies other
 than the Google Charts API for rendering CloudWatch metrics.
+
+**Supported Platforms:**
+* Slack (via Incoming Webhooks)
+* Microsoft Teams (via Incoming Webhooks or Power Automate)
 
 Supported AWS product notification formats:
 * Auto-Scaling Events
@@ -34,6 +38,7 @@ Supported AWS product notification formats:
 * CodeDeploy 🆕 _(via SNS/CloudWatch)_
 * CodePipeline 🆕 _(via SNS/CloudWatch)_
 * CodePipeline Manual Approval 🆕
+* Config
 * Elastic Beanstalk
 * Event-bridge (AWS Config Compliance Change, Remediation Execution Status Change, Remediation Execution Failures) 🆕
 * GuardDuty 🆕
@@ -83,7 +88,9 @@ See [Managing Multiple Deployments](#managing-multiple-deployments) for a `.env`
 
 ## Installation
 
-### Step 1: Setup Slack
+### Step 1: Setup Notification Platform
+
+#### For Slack:
 The Lambda function communicates with Slack through a Slack webhook
 [webhook](https://my.slack.com/apps/manage). Note that you can either create an app, or a custom integration > Incoming webhook (easier, will only let you add a webhook)
 
@@ -97,6 +104,13 @@ The Lambda function communicates with Slack through a Slack webhook
 
 ![Slack Configuration](./docs/config-slack.png)
 
+#### For Microsoft Teams:
+1. In Teams, go to the channel where you want to receive notifications
+2. Click the three dots (...) next to the channel name
+3. Select "Connectors" or "Workflows" > "Incoming Webhook"
+4. Configure the webhook and copy the URL
+5. Use this URL in the CloudFormation template
+
 ### Step 2: Configure & Launch the CloudFormation Stack
 
 Note that the AWS region will be the region from which you launch the CloudFormation wizard, which will also scope the resources (SNS, etc.) to that region. 
@@ -107,8 +121,9 @@ Launch the CloudFormation Stack by using our preconfigured CloudFormation
 **Afterwards**
 
 Click "Next" and on the following page name your new stack and paste the
-webhook URL from before into the "HookUrl" field. You can also configure a
-different channel to post to if wanted.
+webhook URL (Slack or Teams) from before into the "HookUrl" field. The Lambda
+will automatically detect the platform and format messages appropriately. You can also configure a
+different channel to post to if wanted (Slack only).
 
 ![AWS CloudFormation Configuration](./docs/config-stack.png)
 
@@ -122,7 +137,7 @@ The Makefile found in this repository assists with the deployment of the tool. T
 1. Create a `.env` file that includes the following as a minumum:
    ```
    STACK_NAME=aws-to-slack
-   STACK_PARAMS="ParameterKey=HookUrl,ParameterValue=<https://hooks.slack.com/services/<YOUR_SLACK_WEBHOOK>>"
+   STACK_PARAMS="ParameterKey=HookUrl,ParameterValue=<YOUR_WEBHOOK_URL>"
    ```
 2. Configure your AWS Credentials via CLI
 3. Use the `make create-stack TARGET=.env` command to create the Cloudformation stack
@@ -146,7 +161,7 @@ Randy Findley.
 To enable CodeBuild notifications add a new _CloudWatch Event Rule_, choose _CodeBuild_
 as source and _CodeBuild Build State Change_ as type. As Target select the `aws-to-slack`
 Lambda. You can leave all other settings as is. Once your rule is created all CodeBuild
-build state events will be forwarded to your Slack channel.
+build state events will be forwarded to your notification channel.
 
 ### Setting Up AWS CodeCommit
 
@@ -159,7 +174,7 @@ as the source, and select one of the supported event types:
 * _CodeCommit Repository State Change_ - Will generate events when a branch
   or tag reference is created, updated, or deleted.
 
-Add the `aws-to-slack` lambda as the target. No other settings are needed.
+Add the `aws-notifications` lambda as the target. No other settings are needed.
 
 ## Managing Multiple Deployments
 

@@ -280,8 +280,8 @@ class SlackLink {
 }
 
 /**
- * Clone so sub-modules never have to explicitly import the Slack module.
+ * Clone so sub-modules never have to explicitly import the notifications module.
  */
-EventDef.COLORS = require("./slack").COLORS;
+EventDef.COLORS = require("./notifications").COLORS;
 
 module.exports = EventDef;
