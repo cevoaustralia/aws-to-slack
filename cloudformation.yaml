@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'SNS notification sent to Slack channel'
+Description: 'Processes AWS Notifications for Consumption by Slack or Teams Webhooks'
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:

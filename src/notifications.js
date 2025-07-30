@@ -101,46 +101,122 @@ class Notifications {
 	static convertToTeamsFormat(message) {
 		// Keep attachments array structure for Power Automate compatibility
 		return {
-			attachments: message.attachments?.map(attachment => ({
-				contentType: "application/vnd.microsoft.card.adaptive",
-				content: {
-					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-					type: "AdaptiveCard",
-					version: "1.2",
-					body: [
-						{
-							type: "TextBlock",
-							text: attachment.author_name || "AWS Notification",
-							weight: "Bolder",
-							size: "Medium"
-						},
-						{
-							type: "TextBlock",
-							text: attachment.title || "",
-							weight: "Bolder"
-						},
-						{
-							type: "TextBlock",
-							text: attachment.text || "",
-							wrap: true
-						},
-						...(attachment.fields?.map(field => ({
-							type: "FactSet",
-							facts: [{
-								title: field.title,
-								value: field.value
-							}]
-						})) || [])
-					],
-					...(attachment.title_link && {
-						actions: [{
-							type: "Action.OpenUrl",
-							title: "View in AWS Console",
-							url: attachment.title_link
-						}]
-					})
+			attachments: message.attachments?.map(attachment => {
+				// Handle Slack blocks format (used by AWS Config)
+				if (attachment.blocks) {
+					return this.convertSlackBlocksToTeams(attachment);
 				}
-			})) || []
+				
+				// Handle standard attachment format
+				return {
+					contentType: "application/vnd.microsoft.card.adaptive",
+					content: {
+						"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+						type: "AdaptiveCard",
+						version: "1.2",
+						body: [
+							{
+								type: "TextBlock",
+								text: attachment.author_name || "AWS Notification",
+								weight: "Bolder",
+								size: "Medium"
+							},
+							{
+								type: "TextBlock",
+								text: attachment.title || "",
+								weight: "Bolder"
+							},
+							{
+								type: "TextBlock",
+								text: attachment.text || "",
+								wrap: true
+							},
+							...(attachment.fields?.map(field => ({
+								type: "FactSet",
+								facts: [{
+									title: field.title,
+									value: field.value
+								}]
+							})) || [])
+						],
+						...(attachment.title_link && {
+							actions: [{
+								type: "Action.OpenUrl",
+								title: "View in AWS Console",
+								url: attachment.title_link
+							}]
+						})
+					}
+				};
+			}) || []
+		};
+	}
+
+	/**
+	 * Converts Slack blocks format to Teams Adaptive Card.
+	 *
+	 * @param {Object} attachment - Slack attachment with blocks
+	 * @returns {Object} Teams formatted attachment
+	 */
+	static convertSlackBlocksToTeams(attachment) {
+		const body = [];
+		let actions = [];
+
+		attachment.blocks?.forEach(block => {
+			if (block.type === "header") {
+				body.push({
+					type: "TextBlock",
+					text: block.text?.text || "",
+					weight: "Bolder",
+					size: "Large"
+				});
+			} else if (block.type === "section" && block.fields) {
+				const facts = block.fields.map(field => {
+					const text = field.text || "";
+					// Extract title and value from Slack markdown format: *Title:*\nValue
+					const match = text.match(/\*([^*]+):\*\n(.+)/s);
+					if (match) {
+						let value = match[2].trim();
+						// Convert Slack emojis to text
+						value = value.replace(/:large_green_circle:/g, "✅")
+								 .replace(/:red_circle:/g, "❌")
+								 .replace(/:warning:/g, "⚠️");
+						return {
+							title: match[1],
+							value: value
+						};
+					}
+					return null;
+				}).filter(fact => fact !== null);
+				
+				if (facts.length) {
+					body.push({
+						type: "FactSet",
+						facts
+					});
+				}
+			} else if (block.type === "actions") {
+				block.elements?.forEach(element => {
+					if (element.type === "button" && element.url) {
+						actions.push({
+							type: "Action.OpenUrl",
+							title: element.text?.text || "View",
+							url: element.url
+						});
+					}
+				});
+			}
+		});
+
+		return {
+			contentType: "application/vnd.microsoft.card.adaptive",
+			content: {
+				"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+				type: "AdaptiveCard",
+				version: "1.2",
+				body,
+				...(actions.length && { actions })
+			}
 		};
 	}
 
